@@ -1,0 +1,3378 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <title>DSR Hope</title>
+  <meta name="theme-color" content="#FFAFC1">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-title" content="DSR Hope">
+
+  <link rel="manifest" href="manifest.json">
+  <link id="app-icon-png" rel="icon" type="image/png" sizes="192x192">
+  <link id="apple-icon-png" rel="apple-touch-icon" sizes="192x192">
+
+  <!-- Supabase client -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+  <!-- ====== PASTE YOUR KEYS HERE (one-time) ====== -->
+  <script>
+    window.DSR_CONFIG = {
+      supabaseUrl: "https://yicwamikaflgapwscfeo.supabase.co",
+      // PASTE your full anon key between the quotes below:
+      supabaseAnonKey: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InlpY3dhbWlrYWZsZ2Fwd3NjZmVvIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTA2OTU4MDEsImV4cCI6MjEwNjI3MTgwMX0.G04eKTsPzV0jbsTuSoubvLk0at3UNWeq7B5DFzSEMIQ",
+      vapidPublicKey: "BMhUErpxTD3EBsoeYt4x92cPaBKxKfXPJPJDmeQ3oZQBzj_P7vKkncexEBrlXOLCQKZU1UuF-L43t7FvVs3u8n4"
+    };
+  </script>
+
+  <script>
+    (function generateAndroidPngIcon() {
+      try {
+        var c = document.createElement('canvas');
+        c.width = 192;
+        c.height = 192;
+        var ctx = c.getContext('2d');
+        var grd = ctx.createRadialGradient(96, 65, 10, 96, 96, 120);
+        grd.addColorStop(0, '#FFFFFF');
+        grd.addColorStop(0.45, '#FFCAD4');
+        grd.addColorStop(1, '#FF758C');
+        ctx.fillStyle = grd;
+        if (ctx.roundRect) { ctx.roundRect(0, 0, 192, 192, 42); ctx.fill(); }
+        else { ctx.fillRect(0, 0, 192, 192); }
+        ctx.font = '76px serif';
+        ctx.textAlign = 'center';
+        ctx.textBaseline = 'middle';
+        ctx.fillText('🌸', 96, 78);
+        ctx.font = '900 21px sans-serif';
+        ctx.fillStyle = '#881337';
+        ctx.fillText('DSR HOPE', 96, 146);
+        var pngUrl = c.toDataURL('image/png');
+        document.getElementById('app-icon-png').href = pngUrl;
+        document.getElementById('apple-icon-png').href = pngUrl;
+        // Also expose for service worker icon
+        window.DSR_ICON_DATAURL = pngUrl;
+      } catch (e) {}
+    })();
+  </script>
+
+  <!-- Tailwind CSS & Confetti CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+  
+  <!-- Google Fonts: Plus Jakarta Sans & Playfair Display -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=Playfair+Display:ital,wght@0,600;0,700;1,400;1,600&display=swap" rel="stylesheet">
+
+  <style>
+    * {
+      -webkit-tap-highlight-color: transparent;
+      box-sizing: border-box;
+      user-select: none;
+    }
+    body {
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      background: linear-gradient(145deg, #FFDFD6 0%, #FFC9D4 38%, #FFAFC1 72%, #FF97AF 100%);
+      min-height: 100vh;
+      margin: 0;
+      padding: 0;
+      overflow-x: hidden;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      color: #1c1917;
+      transition: background 0.4s ease, color 0.4s ease;
+    }
+    .font-serif-title { font-family: 'Playfair Display', serif; }
+    
+    /* Luxury Glassmorphism */
+    .glass-shell {
+      background: rgba(255, 255, 255, 0.62);
+      backdrop-filter: blur(28px);
+      -webkit-backdrop-filter: blur(28px);
+      border: 1.5px solid rgba(255, 255, 255, 0.85);
+      box-shadow: 0 24px 64px -12px rgba(220, 60, 95, 0.35);
+      transition: background 0.3s ease, border-color 0.3s ease;
+    }
+    .glass-card {
+      background: rgba(255, 255, 255, 0.90);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      border: 1.2px solid rgba(255, 255, 255, 0.98);
+      box-shadow: 0 10px 24px -5px rgba(235, 110, 130, 0.15);
+      transition: background 0.3s ease, border-color 0.3s ease;
+    }
+
+    /* Moonlit Dark Theme (Gentle on Eyes) */
+    body.dark-theme {
+      background: linear-gradient(145deg, #181419 0%, #221A23 50%, #151117 100%) !important;
+      color: #F5EAE9 !important;
+    }
+    body.dark-theme .glass-shell {
+      background: rgba(26, 21, 28, 0.82) !important;
+      border-color: rgba(255, 255, 255, 0.12) !important;
+      box-shadow: 0 24px 64px -12px rgba(0, 0, 0, 0.7) !important;
+    }
+    body.dark-theme .glass-card {
+      background: rgba(36, 29, 39, 0.92) !important;
+      border-color: rgba(255, 255, 255, 0.10) !important;
+      box-shadow: 0 10px 24px -5px rgba(0, 0, 0, 0.4) !important;
+      color: #F5EAE9 !important;
+    }
+    body.dark-theme .text-stone-900,
+    body.dark-theme .text-stone-800,
+    body.dark-theme .text-stone-700 {
+      color: #F7EBEA !important;
+    }
+    body.dark-theme .text-stone-600,
+    body.dark-theme .text-stone-500 {
+      color: #D1C2C4 !important;
+    }
+    body.dark-theme .bg-white {
+      background-color: #2F2433 !important;
+      color: #F7EBEA !important;
+    }
+    body.dark-theme .border-stone-200,
+    body.dark-theme .border-stone-100 {
+      border-color: rgba(255, 255, 255, 0.12) !important;
+    }
+    body.dark-theme input,
+    body.dark-theme textarea {
+      background-color: #261E2A !important;
+      color: #FFFFFF !important;
+      border-color: rgba(255, 255, 255, 0.18) !important;
+    }
+
+    .glow-pod {
+      background: radial-gradient(circle at 35% 30%, #FFFFFF 0%, #FFCAD4 30%, #FF758C 70%, #E83F68 100%);
+      box-shadow: 0 16px 40px -6px rgba(245, 60, 100, 0.5), inset 0 -6px 14px rgba(0,0,0,0.1), inset 0 4px 12px rgba(255,255,255,0.85);
+      animation: gentleBreathe 4s ease-in-out infinite;
+    }
+    @keyframes gentleBreathe {
+      0%, 100% { transform: scale(1); filter: drop-shadow(0 0 18px rgba(255, 100, 130, 0.45)); }
+      50% { transform: scale(1.04); filter: drop-shadow(0 0 28px rgba(255, 60, 95, 0.75)); }
+    }
+    .jar-glow {
+      background: radial-gradient(circle at 50% 40%, rgba(255,255,255,0.95) 0%, rgba(255,224,230,0.8) 50%, rgba(255,142,165,0.4) 100%);
+      box-shadow: 0 12px 30px -4px rgba(255, 100, 135, 0.35), inset 0 0 15px rgba(255,255,255,0.9);
+      animation: jarFloat 3.8s ease-in-out infinite;
+    }
+    @keyframes jarFloat {
+      0%, 100% { transform: translateY(0px); }
+      50% { transform: translateY(-5px); }
+    }
+    .breathing-orb { animation: breathingCycle 19s infinite ease-in-out; }
+    @keyframes breathingCycle {
+      0%, 100% { transform: scale(0.85); background-color: #FFCAD4; }
+      21% { transform: scale(1.28); background-color: #FF758C; }
+      57% { transform: scale(1.28); background-color: #FFAAA6; }
+      100% { transform: scale(0.85); background-color: #FFCAD4; }
+    }
+    .check-btn-active {
+      background: linear-gradient(135deg, #E11D48 0%, #F43F5E 100%) !important;
+      border-color: transparent !important;
+      color: white !important;
+    }
+    .no-scrollbar::-webkit-scrollbar { display: none; }
+    .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+    input, textarea { -webkit-user-select: text; user-select: text; }
+    
+    body.hard-day {
+      background: linear-gradient(145deg, #F5EBE6 0%, #EFE5E0 50%, #E6DBD5 100%);
+    }
+    body.hard-day .glow-pod {
+      animation: none !important;
+      background: radial-gradient(circle at 35% 30%, #FFFFFF 0%, #E7DCD5 60%, #C9B8B0 100%);
+      box-shadow: 0 8px 20px rgba(0,0,0,0.06);
+    }
+  </style>
+</head>
+<body class="p-0 sm:p-4">
+
+  <!-- Main Mobile App Shell -->
+  <div class="glass-shell w-full max-w-[430px] h-[100dvh] sm:h-[880px] sm:rounded-[48px] flex flex-col justify-between relative overflow-hidden shadow-2xl">
+
+    <!-- Top Phone Status Header -->
+    <div class="pt-3.5 px-4 pb-2 flex justify-between items-center text-xs font-bold text-stone-800 shrink-0">
+      <div onclick="goHomeToday()" class="flex items-center gap-1.5 cursor-pointer active:scale-95 transition" title="Tap to return to Today">
+        <span class="text-base">🌸</span>
+        <span class="tracking-wide font-extrabold text-rose-950 text-sm">DSR Hope</span>
+      </div>
+      
+      <!-- Right Action Cluster: Uniform 28px Height & Tabular Figures -->
+      <div class="flex items-center gap-2">
+        <button id="pin-lock-toggle-btn" onclick="openPinModal()" class="h-7 px-2.5 rounded-full text-[11px] font-bold border bg-white/80 text-stone-700 hover:bg-white active:scale-95 transition flex items-center justify-center shadow-2xs" title="Light PIN Privacy">
+          🔒 PIN
+        </button>
+        
+        <button onclick="openSettingsModal()" class="w-7 h-7 rounded-full text-[12px] font-bold border bg-white/80 text-stone-700 hover:bg-white active:scale-95 transition flex items-center justify-center shadow-2xs" title="Sanctuary Settings Hub">
+          ⚙️
+        </button>
+        
+        <span id="current-clock" class="font-mono tabular-nums text-[11px] font-extrabold text-stone-900 tracking-tight ml-0.5 min-w-[72px] text-right">
+          09:41:25 PM
+        </span>
+      </div>
+    </div>
+
+    <!-- MAIN APP SCREENS CONTAINER (Clear pb-32 to prevent dock overlap) -->
+    <div class="flex-1 overflow-y-auto no-scrollbar px-4 pb-32 pt-1 space-y-4" id="scroll-container">
+
+      <!-- SCREEN 1: DAILY SANCTUARY (HOME) -->
+      <section id="screen-home" class="space-y-4">
+        
+        <!-- Pause / Rest Banner -->
+        <div id="pause-banner" class="hidden p-4 rounded-3xl bg-amber-50/95 border border-amber-200 text-amber-950 shadow-sm transition">
+          <div class="flex items-start gap-3">
+            <span class="text-2xl">🕊️</span>
+            <div class="flex-1">
+              <div class="flex items-center justify-between">
+                <h4 class="text-xs font-bold uppercase tracking-wider text-amber-900">Cycle On Gentle Rest</h4>
+                <button onclick="openSettingsModal()" class="text-[10px] font-bold text-amber-800 underline">Change in ⚙️</button>
+              </div>
+              <p class="text-xs text-amber-800 mt-0.5 leading-relaxed">
+                Rest mode is on. Take pressure completely off. If skipping a prescribed dose, please let your clinic know.
+              </p>
+            </div>
+          </div>
+        </div>
+
+        <!-- MODULE 1: Hope Cards & 75s Hope Calm -->
+        <div id="mod-hope-cards" class="glass-card rounded-3xl p-4 border border-white shadow-sm space-y-3">
+          <div class="flex items-center justify-between">
+            <div class="flex items-center gap-1.5">
+              <span class="text-sm">💌</span>
+              <span class="text-[11px] font-extrabold uppercase tracking-wider text-stone-800">Hope Cards</span>
+            </div>
+            <div class="flex bg-rose-100/70 p-0.5 rounded-xl border border-white">
+              <button onclick="setHopeTone('Hopeful')" id="tone-hopeful" class="px-2 py-0.5 rounded-lg text-[10px] font-bold text-stone-700">Hopeful</button>
+              <button onclick="setHopeTone('Steady')" id="tone-steady" class="px-2 py-0.5 rounded-lg text-[10px] font-bold text-stone-700">Steady</button>
+              <button onclick="setHopeTone('Just today')" id="tone-just-today" class="px-2 py-0.5 rounded-lg text-[10px] font-extrabold bg-white text-rose-600 shadow-2xs">Just today</button>
+            </div>
+          </div>
+
+          <div class="p-3.5 rounded-2xl bg-white/95 border border-rose-100 shadow-2xs space-y-1">
+            <p id="hope-card-quote" class="text-xs font-medium text-stone-800 leading-relaxed italic transition-opacity duration-200">
+              "Hope is a direction, not a promise."
+            </p>
+            <p id="hope-card-sub" class="text-[10px] text-stone-500 text-right">No pressure. Just presence.</p>
+          </div>
+
+          <div class="flex gap-2">
+            <button onclick="drawHopeCard()" class="flex-1 py-2 px-3 rounded-xl bg-white border border-stone-200 text-xs font-bold text-stone-800 hover:bg-stone-50 active:scale-95 transition">
+              ✨ Tap for New Card
+            </button>
+            <button onclick="startHopeVisualization()" class="py-2 px-3 rounded-xl bg-gradient-to-r from-rose-500 to-pink-500 text-white text-xs font-extrabold shadow-sm active:scale-95 transition flex items-center gap-1.5">
+              <span>🎵</span> 75s Hope Calm
+            </button>
+          </div>
+        </div>
+
+        <!-- Dynamic Milestone Banner -->
+        <div id="scan-alert-banner" class="glass-card p-3.5 rounded-3xl border-l-4 border-l-rose-500 flex items-center justify-between shadow-sm">
+          <div class="flex items-center gap-2.5">
+            <div class="w-8 h-8 rounded-xl bg-rose-100 flex items-center justify-center text-rose-600 text-sm font-bold">
+              🔍
+            </div>
+            <div>
+              <div class="flex items-center gap-1.5">
+                <span class="text-[10px] font-extrabold tracking-wider uppercase text-rose-600 bg-rose-50 px-2 py-0.5 rounded-full">Next Milestone</span>
+                <span id="scan-date-label" class="text-xs font-bold text-stone-600">Scan • Oct 4</span>
+              </div>
+              <p class="text-xs font-bold text-stone-900 mt-0.5">Follicle Ultrasound Scan (as told by clinic)</p>
+            </div>
+          </div>
+          <div class="flex items-center gap-2">
+            <span id="scan-countdown-badge" class="text-[11px] font-bold bg-white text-rose-600 px-2 py-1 rounded-xl border border-rose-200">
+              In 6 Days
+            </span>
+            <button onclick="openMilestonesModal()" class="text-[11px] font-bold text-rose-600 bg-white px-2 py-1 rounded-xl border border-stone-200 hover:bg-rose-50">
+              ✏️
+            </button>
+          </div>
+        </div>
+
+        <!-- Stimulation Timeline Strip (Anchored on Today) -->
+        <div>
+          <div class="flex items-center justify-between text-xs font-bold text-stone-700 mb-1.5 px-1">
+            <span class="flex items-center gap-2">
+              <span id="timeline-phase-label">STIMULATION TIMELINE</span>
+              <button id="jump-to-today-btn" onclick="selectDay(getTodayDay())" class="hidden text-[10px] font-extrabold bg-rose-100 text-rose-700 px-2 py-0.5 rounded-full border border-rose-200 hover:bg-rose-200 active:scale-95 transition">
+                ↩ Jump to Today
+              </button>
+            </span>
+            <span class="text-rose-600 font-extrabold" id="current-day-label">Day 2 of 15</span>
+          </div>
+          <div class="flex gap-2 overflow-x-auto no-scrollbar py-1 px-0.5 scroll-smooth" id="day-pills-row"></div>
+        </div>
+
+        <!-- MODULE 2: Compassionate Whisper Card -->
+        <div id="mod-whisper-card" class="glass-card rounded-3xl p-4 relative overflow-hidden border border-white">
+          <div class="flex items-center justify-between mb-1.5">
+            <div class="flex items-center gap-2">
+              <span class="text-sm">🕊️</span>
+              <span id="whisper-header-tag" class="text-[11px] font-extrabold uppercase tracking-wider text-rose-600">A Gentle Whisper For You</span>
+            </div>
+            <button onclick="switchTab('journal')" class="text-xs font-bold text-rose-600 hover:underline">Write in Jar →</button>
+          </div>
+          <p id="baby-letter-text" class="text-xs font-serif-title italic text-stone-900 leading-relaxed font-medium">
+            "Your body is doing sacred, brave work today. Take this hour one single drop at a time."
+          </p>
+        </div>
+
+        <!-- MODULE 3: Sanctuary Pod -->
+        <div id="mod-sanctuary-pod" class="glass-card rounded-3xl p-5 text-center relative overflow-hidden border border-white">
+          <div class="flex items-center justify-between text-xs font-bold text-stone-600 mb-2 px-1">
+            <span class="flex items-center gap-1.5">
+              <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
+              Sacred Nest
+            </span>
+            <span id="pod-step-counter" class="text-rose-600 font-extrabold">0 of 6 Cares Done</span>
+          </div>
+
+          <div class="my-3 flex justify-center">
+            <div class="w-36 h-36 rounded-full glow-pod flex items-center justify-center p-2.5 cursor-pointer relative" onclick="triggerHeartbeatEffect()">
+              <div class="w-full h-full rounded-full bg-white/20 backdrop-blur-xs border border-white/60 flex flex-col items-center justify-center text-white text-center p-2">
+                <span id="pod-emoji" class="text-4xl filter drop-shadow-md transition-all duration-500 transform hover:scale-110">🌱</span>
+                <p id="pod-status-title" class="text-xs font-black tracking-wide mt-1 drop-shadow">Little Sprout</p>
+                <p id="pod-status-sub" class="text-[10px] text-white font-semibold">Nesting in Love</p>
+              </div>
+            </div>
+          </div>
+
+          <div class="px-2 mt-2">
+            <div class="w-full bg-rose-100/70 h-2.5 rounded-full overflow-hidden p-0.5 border border-white/60">
+              <div id="sanctuary-progress-bar" class="h-full rounded-full bg-gradient-to-r from-rose-500 via-pink-400 to-rose-400 transition-all duration-700" style="width: 0%;"></div>
+            </div>
+            <p id="reassurance-quote" class="text-xs font-bold text-stone-800 mt-2.5">
+              "Every injection is courage. Every dose is hope."
+            </p>
+          </div>
+        </div>
+
+        <!-- MODULE 4: My Wins -->
+        <div id="mod-my-wins" class="glass-card rounded-3xl p-4 border border-white space-y-2">
+          <div class="flex items-center justify-between">
+            <h4 class="text-xs font-extrabold uppercase tracking-wider text-stone-800 flex items-center gap-1.5">
+              <span>🌟</span> My Wins
+            </h4>
+            <span class="text-[10px] font-bold text-stone-500">Only what you did • No streaks</span>
+          </div>
+          <div class="grid grid-cols-3 gap-2 text-center pt-1">
+            <div class="p-2.5 rounded-2xl bg-white border border-stone-100">
+              <span id="win-doses-count" class="block text-base font-black text-rose-600">0</span>
+              <span class="text-[10px] font-bold text-stone-600 leading-tight">Doses Taken</span>
+            </div>
+            <div class="p-2.5 rounded-2xl bg-white border border-stone-100">
+              <span id="win-days-count" class="block text-base font-black text-rose-600">0</span>
+              <span class="text-[10px] font-bold text-stone-600 leading-tight">Full Days Done</span>
+            </div>
+            <div class="p-2.5 rounded-2xl bg-white border border-stone-100">
+              <span id="win-notes-count" class="block text-base font-black text-rose-600">0</span>
+              <span class="text-[10px] font-bold text-stone-600 leading-tight">Notes in Jar</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Today's Miracle Steps (Time-Sorted Routine) -->
+        <div class="space-y-2.5">
+          <div class="flex items-center justify-between px-1">
+            <div>
+              <h3 class="text-xs font-extrabold uppercase tracking-wider text-stone-800 flex items-center gap-1">
+                <span>✨</span> Today's Miracle Steps
+              </h3>
+              <p class="text-[11px] text-stone-600">Sorted by time • Tap ✓ to complete</p>
+            </div>
+            <div class="flex items-center gap-1.5">
+              <button onclick="openAddMedModal()" class="text-xs font-bold text-rose-600 bg-white/90 px-2.5 py-1 rounded-full border border-white shadow-2xs hover:bg-white active:scale-95 transition">
+                ➕ Add Step
+              </button>
+              <button onclick="requestAlertsPermission()" class="text-xs font-bold text-rose-600 bg-white/90 px-2.5 py-1 rounded-full border border-white shadow-2xs hover:bg-white active:scale-95 transition">
+                📅 Alarms
+              </button>
+            </div>
+          </div>
+          
+          <div id="med-list-container" class="space-y-2"></div>
+          
+          <div class="flex items-center justify-between pt-1">
+            <button onclick="openMissedDoseModal()" class="text-xs font-bold text-amber-800 bg-amber-100/90 px-3 py-1.5 rounded-xl border border-amber-200">
+              🕊️ What if I missed a dose?
+            </button>
+            <button onclick="openPlanChangesModal()" class="text-xs font-bold text-stone-700 bg-white/90 px-3 py-1.5 rounded-xl border border-stone-200">
+              🌱 If Plan Changes
+            </button>
+          </div>
+
+          <div class="grid grid-cols-2 gap-2 mt-2">
+            <button onclick="openHowAreWeModal()" class="p-2.5 rounded-2xl bg-white/90 border border-stone-200 text-stone-800 font-bold text-xs text-center shadow-xs">
+              🤍 How Are We Today?
+            </button>
+            <button onclick="openCalm()" class="p-2.5 rounded-2xl bg-gradient-to-tr from-rose-500 to-pink-500 text-white font-extrabold text-xs shadow-md active:scale-95 transition text-center">
+              🧘 Calm & Meditation Hub
+            </button>
+          </div>
+        </div>
+
+        <!-- MODULE 5: Team Check-In -->
+        <div id="mod-team-checkin" class="glass-card rounded-3xl p-4 border border-white space-y-3">
+          <div class="flex items-center justify-between">
+            <h4 class="text-xs font-extrabold uppercase tracking-wider text-stone-800 flex items-center gap-1.5">
+              <span>🤝</span> Team Check-In (What I Need Today)
+            </h4>
+            <span class="text-[10px] text-stone-500 font-bold">For you & partner</span>
+          </div>
+          
+          <div class="flex flex-wrap gap-1.5" id="team-needs-container">
+            <button onclick="toggleTeamNeed(this, 'A warm hug 🤍')" class="team-need-btn px-2.5 py-1.5 rounded-xl bg-white border border-stone-200 text-xs font-bold text-stone-700">A warm hug 🤍</button>
+            <button onclick="toggleTeamNeed(this, 'Someone to listen 👂')" class="team-need-btn px-2.5 py-1.5 rounded-xl bg-white border border-stone-200 text-xs font-bold text-stone-700">Someone to listen 👂</button>
+            <button onclick="toggleTeamNeed(this, 'A little quiet space 🕊️')" class="team-need-btn px-2.5 py-1.5 rounded-xl bg-white border border-stone-200 text-xs font-bold text-stone-700">A little quiet space 🕊️</button>
+            <button onclick="toggleTeamNeed(this, 'Help with the shot 💉')" class="team-need-btn px-2.5 py-1.5 rounded-xl bg-white border border-stone-200 text-xs font-bold text-stone-700">Help with the shot 💉</button>
+            <button onclick="toggleTeamNeed(this, 'A light distraction 🎬')" class="team-need-btn px-2.5 py-1.5 rounded-xl bg-white border border-stone-200 text-xs font-bold text-stone-700">A light distraction 🎬</button>
+          </div>
+
+          <input type="text" id="partner-appreciation-input" placeholder="One thing I appreciate about you today..." oninput="partnerAppreciation=this.value;saveState()" class="w-full text-xs p-2.5 rounded-xl bg-white border border-stone-200 text-stone-900 placeholder:text-stone-400">
+
+          <button onclick="sendTeamCheckInToPartner()" class="w-full py-2.5 rounded-xl bg-gradient-to-r from-emerald-600 to-teal-600 text-white font-bold text-xs shadow-md active:scale-95 transition flex items-center justify-center gap-1.5">
+            <span>💬</span> Send via WhatsApp to Partner
+          </button>
+        </div>
+
+        <div class="grid grid-cols-2 gap-2.5 pt-1">
+          <button onclick="sendSilentHug()" class="py-3 px-3 rounded-2xl bg-white/90 border border-white text-rose-600 font-bold text-xs flex items-center justify-center gap-1.5 shadow-sm active:scale-95 transition">
+            <span>🤍</span>
+            <span>Silent Hug to Partner</span>
+          </button>
+          <button onclick="switchTab('journal')" class="py-3 px-3 rounded-2xl bg-gradient-to-r from-rose-500 to-pink-500 text-white font-bold text-xs flex items-center justify-center gap-1.5 shadow-sm active:scale-95 transition">
+            <span>🫙</span>
+            <span>Open Memory Jar</span>
+          </button>
+        </div>
+
+      </section>
+
+      <!-- SCREEN 2: MULTI-MONTH INTERACTIVE CALENDAR WITH CUSTOM NOTES -->
+      <section id="screen-calendar" class="hidden space-y-4">
+        <div class="flex items-center justify-between">
+          <div>
+            <h2 class="font-serif-title text-xl font-bold text-stone-900">Cycle Care Calendar</h2>
+            <p class="text-xs text-stone-600">Multi-month view • Tap to view & add notes</p>
+          </div>
+          <button onclick="openMilestonesModal()" class="text-xs font-bold text-rose-600 bg-white px-2.5 py-1 rounded-xl border border-stone-200 shadow-2xs">
+            Milestones ✏️
+          </button>
+        </div>
+
+        <!-- Month Grid Card with Prev / Next Navigation -->
+        <div class="glass-card rounded-3xl p-4 border border-white shadow-sm space-y-3">
+          <div class="flex items-center justify-between text-xs font-bold text-stone-800">
+            <button onclick="changeCalMonth(-1)" class="w-8 h-8 rounded-xl bg-white border border-stone-200 flex items-center justify-center text-sm font-extrabold text-stone-700 active:scale-90">‹</button>
+            <span id="calendar-month-header" class="text-sm font-extrabold text-rose-900">October 2026</span>
+            <button onclick="changeCalMonth(1)" class="w-8 h-8 rounded-xl bg-white border border-stone-200 flex items-center justify-center text-sm font-extrabold text-stone-700 active:scale-90">›</button>
+          </div>
+
+          <div class="grid grid-cols-7 gap-1 text-center text-[10px] font-bold text-stone-500">
+            <span>S</span><span>M</span><span>T</span><span>W</span><span>T</span><span>F</span><span>S</span>
+          </div>
+
+          <div id="calendar-days-grid" class="grid grid-cols-7 gap-1.5 text-center"></div>
+
+          <div class="flex flex-wrap items-center justify-center gap-3 pt-2 text-[10px] font-bold text-stone-600 border-t border-stone-100">
+            <span class="flex items-center gap-1"><span class="w-3 h-3 rounded-full border-2 border-rose-500 bg-rose-100 inline-block"></span> Today</span>
+            <span class="flex items-center gap-1"><span class="w-3 h-3 rounded-full bg-rose-100 inline-block"></span> Stim Days</span>
+            <span class="flex items-center gap-1">⭐ Scan</span>
+            <span class="flex items-center gap-1">🌟 Trigger</span>
+            <span class="flex items-center gap-1">🌸 Retrieval</span>
+            <span class="flex items-center gap-1">📝 Note</span>
+          </div>
+        </div>
+
+        <!-- Selected Date Care Details & Add Note Box -->
+        <div id="calendar-day-care-card" class="glass-card rounded-3xl p-4 border border-white space-y-3">
+          <div class="flex items-center justify-between">
+            <h4 id="cal-selected-day-title" class="text-xs font-extrabold text-stone-800">Care on Selected Date</h4>
+            <button id="add-cal-note-btn" onclick="openAddCalendarNotePrompt()" class="text-xs font-extrabold text-rose-600 bg-rose-50 border border-rose-200 px-2 py-0.5 rounded-lg">
+              ➕ Add Note / Care
+            </button>
+          </div>
+          
+          <div id="cal-selected-day-desc" class="text-xs text-stone-600 leading-relaxed">Tap any day in the month above to view clinical doses, scans, and notes.</div>
+          
+          <div id="cal-user-notes-list" class="space-y-1 pt-1"></div>
+          <div id="cal-selected-meds-list" class="space-y-1.5 pt-1"></div>
+        </div>
+      </section>
+
+      <!-- SCREEN 3: 3-MONTH ROADMAP & MIRACLE DELIVERY CALCULATOR -->
+      <section id="screen-roadmap" class="hidden space-y-4">
+        <div class="flex items-center justify-between">
+          <div>
+            <h2 class="font-serif-title text-xl font-bold text-stone-900">3-Month Miracle Journey</h2>
+            <p class="text-xs text-stone-600">Roadmap & estimated miracle arrival</p>
+          </div>
+          <button onclick="openProtocolModal()" class="text-xs font-bold text-rose-600 bg-white/90 px-3 py-1.5 rounded-full border border-white shadow-2xs hover:bg-white active:scale-95 transition">
+            ✏️ Edit Protocol
+          </button>
+        </div>
+
+        <!-- MIRACLE ARRIVAL DAY PREVIEW CARD -->
+        <div class="glass-card rounded-3xl p-4 border-2 border-rose-300/80 bg-gradient-to-br from-white via-rose-50/50 to-pink-50/60 shadow-md space-y-2">
+          <div class="flex items-center justify-between">
+            <span class="text-[11px] font-black uppercase tracking-wider text-rose-600 flex items-center gap-1.5">
+              <span>🍼</span> Miracle Delivery Window
+            </span>
+            <span class="text-[10px] font-bold text-stone-500 bg-white px-2 py-0.5 rounded-full border border-rose-100">40-Week Horizon</span>
+          </div>
+          <p id="miracle-due-date-text" class="text-sm font-serif-title font-extrabold text-stone-900 leading-snug">
+            Expected Arrival: Early July 2027 🌸
+          </p>
+          <p id="miracle-due-date-sub" class="text-[11px] text-stone-600 leading-relaxed">
+            If all unfolds smoothly with your retrieval and transfer, your little miracle will be in your arms around this time. Every body and baby blooms in their own perfect time.
+          </p>
+        </div>
+
+        <!-- Clinical Milestones Card -->
+        <div class="glass-card rounded-3xl p-4 border border-white space-y-2">
+          <div class="flex items-center justify-between">
+            <h4 class="text-xs font-bold text-stone-800 flex items-center gap-1.5">
+              <span>🩺</span> Milestones (As told by your clinic)
+            </h4>
+            <button onclick="openMilestonesModal()" class="text-[11px] font-extrabold text-rose-600 hover:underline">Edit Dates</button>
+          </div>
+          <div class="grid grid-cols-3 gap-2 text-center pt-1 text-xs">
+            <div class="p-2 rounded-xl bg-white border border-stone-200">
+              <span class="block text-[10px] text-stone-500 font-bold uppercase">Scan Date</span>
+              <span id="milestone-scan-disp" class="font-extrabold text-stone-800">Oct 4</span>
+            </div>
+            <div class="p-2 rounded-xl bg-white border border-stone-200">
+              <span class="block text-[10px] text-stone-500 font-bold uppercase">Trigger Date</span>
+              <span id="milestone-trigger-disp" class="font-extrabold text-stone-800">Pending</span>
+            </div>
+            <div class="p-2 rounded-xl bg-white border border-stone-200">
+              <span class="block text-[10px] text-stone-500 font-bold uppercase">Retrieval</span>
+              <span id="milestone-retrieval-disp" class="font-extrabold text-stone-800">Pending</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- 1-Month Ovary Rest Toggle -->
+        <div class="glass-card rounded-2xl p-4 flex items-center justify-between border border-white">
+          <div class="pr-2">
+            <h4 class="text-xs font-bold text-stone-800">1-Month Ovary Rest / Freeze-All</h4>
+            <p class="text-xs text-stone-600 mt-0.5 leading-snug">
+              Turn on only if your doctor advises resting the ovaries before transfer.
+            </p>
+          </div>
+          <label class="relative inline-flex items-center cursor-pointer shrink-0">
+            <input type="checkbox" id="rest-month-toggle" onchange="toggleRestProtocol(this)" class="sr-only peer">
+            <div class="w-11 h-6 bg-stone-300 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-stone-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-rose-500"></div>
+          </label>
+        </div>
+
+        <!-- Journey Stages -->
+        <div class="space-y-3 relative before:absolute before:inset-0 before:left-4 before:w-0.5 before:bg-rose-200/70">
+          <div class="relative flex items-start gap-3.5 pl-1">
+            <div class="w-7 h-7 rounded-full bg-rose-500 text-white font-bold text-xs flex items-center justify-center shrink-0 z-10 shadow-md">1</div>
+            <div class="glass-card flex-1 rounded-2xl p-3.5 border-l-4 border-l-rose-500">
+              <div class="flex items-center justify-between">
+                <span class="text-[11px] font-extrabold uppercase text-rose-600 bg-rose-50 px-2 py-0.5 rounded-full">ACTIVE PHASE</span>
+                <span class="text-xs font-bold text-stone-500">Stimulation & Retrieval</span>
+              </div>
+              <h4 class="text-xs font-bold text-stone-900 mt-1">Follicle Nurturing & OPU</h4>
+              <p class="text-xs text-stone-600 mt-0.5">Growing healthy follicles through daily routine.</p>
+            </div>
+          </div>
+
+          <div class="relative flex items-start gap-3.5 pl-1">
+            <div id="phase2-badge" class="w-7 h-7 rounded-full bg-stone-200 text-stone-600 font-bold text-xs flex items-center justify-center shrink-0 z-10">2</div>
+            <div class="glass-card flex-1 rounded-2xl p-3.5 border-l-4 border-l-stone-300">
+              <div class="flex items-center justify-between">
+                <span id="phase2-tag" class="text-[11px] font-extrabold uppercase text-stone-600 bg-stone-100 px-2 py-0.5 rounded-full">LAB & RECOVERY</span>
+                <span class="text-xs font-bold text-stone-500">Embryo Care</span>
+              </div>
+              <h4 id="phase2-title" class="text-xs font-bold text-stone-900 mt-1">Embryo Development & Healing</h4>
+              <p id="phase2-desc" class="text-xs text-stone-600 mt-0.5">Embryologists nurture blastocysts while your body rests.</p>
+            </div>
+          </div>
+
+          <div class="relative flex items-start gap-3.5 pl-1">
+            <div class="w-7 h-7 rounded-full bg-stone-200 text-stone-600 font-bold text-xs flex items-center justify-center shrink-0 z-10">3</div>
+            <div class="glass-card flex-1 rounded-2xl p-3.5 border-l-4 border-l-stone-300">
+              <div class="flex items-center justify-between">
+                <span class="text-[11px] font-extrabold uppercase text-pink-600 bg-pink-50 px-2 py-0.5 rounded-full">DESTINATION</span>
+                <span class="text-xs font-bold text-stone-500">Transfer & Test</span>
+              </div>
+              <h4 class="text-xs font-bold text-stone-900 mt-1">Frozen Embryo Transfer (FET)</h4>
+              <p class="text-xs text-stone-600 mt-0.5">Preparing the plush womb lining for transfer day.</p>
+            </div>
+          </div>
+        </div>
+
+        <div class="glass-card rounded-2xl p-4">
+          <h4 class="text-xs font-bold text-stone-900 mb-2">📋 Doctor's Current Prescription Protocol</h4>
+          <ul id="rx-list" class="text-xs text-stone-700 space-y-1.5 list-disc pl-4 font-medium"></ul>
+        </div>
+        
+        <div class="glass-card rounded-2xl p-4 space-y-2">
+          <h4 class="text-xs font-bold text-stone-900">💾 Safe Storage & Backup</h4>
+          <p class="text-xs text-stone-600">Save a backup file every month (or after big changes). Each phone keeps its own full copy. Sync between phones comes in the next phase.</p>
+          <div class="flex gap-2 flex-wrap">
+            <button onclick="exportBackup()" class="text-xs font-bold text-rose-600 bg-white px-3 py-2 rounded-xl border border-rose-100">Save Backup</button>
+            <label class="text-xs font-bold text-stone-700 bg-white px-3 py-2 rounded-xl border border-stone-200 cursor-pointer">Restore Backup<input type="file" accept="application/json" class="hidden" onchange="importBackup(this)"></label>
+          </div>
+        </div>
+      </section>
+
+      <!-- SCREEN 4: WRITE TO BABY & MEMORY JAR HUB -->
+      <section id="screen-journal" class="hidden space-y-4">
+        <div class="flex items-center justify-between">
+          <div>
+            <h2 class="font-serif-title text-xl font-bold text-stone-900">Hope Memory Jar</h2>
+            <p class="text-xs text-stone-600">Preserving our love story before you arrive</p>
+          </div>
+          <button onclick="promptHeartfeltIdea()" class="text-xs font-extrabold text-rose-600 bg-white/90 px-3 py-1.5 rounded-full border border-white shadow-2xs hover:bg-white active:scale-95 transition flex items-center gap-1">
+            <span>💡</span> Prompt Idea
+          </button>
+        </div>
+
+        <div class="glass-card rounded-3xl p-4 text-center border border-white relative overflow-hidden">
+          <div class="flex justify-center my-2">
+            <div onclick="tapJarCelebration()" class="w-28 h-32 rounded-3xl jar-glow border-2 border-white/90 flex flex-col items-center justify-center p-2 cursor-pointer transition transform active:scale-95">
+              <span class="text-3xl filter drop-shadow">🫙</span>
+              <span id="jar-counter-badge" class="text-sm font-extrabold text-rose-600 mt-1">0 Letters</span>
+              <span class="text-[10px] font-bold text-stone-600">Stored with Love</span>
+            </div>
+          </div>
+          <p class="text-xs font-semibold text-stone-800">"One day, we will read these pages together at bedtime."</p>
+        </div>
+
+        <div class="glass-card rounded-3xl p-4 border border-white space-y-3">
+          <div class="flex items-center justify-between">
+            <span class="text-xs font-bold text-stone-800">New Memory Jar Entry</span>
+            <div class="flex bg-rose-100/60 p-0.5 rounded-xl border border-white">
+              <button type="button" onclick="setAuthor('Mommy')" id="author-mom" class="px-2.5 py-1 rounded-lg text-xs font-extrabold bg-white text-rose-600 shadow-2xs">Mommy 👩‍🍼</button>
+              <button type="button" onclick="setAuthor('Daddy')" id="author-dad" class="px-2.5 py-1 rounded-lg text-xs font-bold text-stone-600">Daddy 👨‍🍼</button>
+              <button type="button" onclick="setAuthor('Both')" id="author-both" class="px-2.5 py-1 rounded-lg text-xs font-bold text-stone-600">Together 🤍</button>
+            </div>
+          </div>
+
+          <div class="flex gap-1.5 overflow-x-auto no-scrollbar py-0.5" id="tag-pills">
+            <button onclick="setMemoryTag(this, '💉 Brave Shot')" class="tag-pill shrink-0 px-2 py-1 rounded-lg text-xs font-bold bg-rose-500 text-white border border-rose-500 shadow-2xs">💉 Brave Shot</button>
+            <button onclick="setMemoryTag(this, '🔍 Scan Milestone')" class="tag-pill shrink-0 px-2 py-1 rounded-lg text-xs font-bold bg-white text-stone-600 border border-stone-200">🔍 Scan Milestone</button>
+            <button onclick="setMemoryTag(this, '💭 Bedtime Whisper')" class="tag-pill shrink-0 px-2 py-1 rounded-lg text-xs font-bold bg-white text-stone-600 border border-stone-200">💭 Bedtime Whisper</button>
+            <button onclick="setMemoryTag(this, '🤍 Daddy\'s Hug')" class="tag-pill shrink-0 px-2 py-1 rounded-lg text-xs font-bold bg-white text-stone-600 border border-stone-200">🤍 Daddy's Hug</button>
+          </div>
+
+          <div class="relative">
+            <textarea id="letter-input" rows="3" placeholder="Dear little baby, today we took our brave steps for you..." class="w-full text-xs p-3 rounded-xl bg-white/95 border border-stone-200 focus:outline-none focus:border-rose-400 resize-none text-stone-900 leading-relaxed font-medium"></textarea>
+          </div>
+
+          <div class="flex items-center justify-between pt-0.5">
+            <label class="cursor-pointer flex items-center gap-1.5 text-xs font-bold text-rose-600 hover:text-rose-700">
+              <span>📷</span>
+              <span id="photo-upload-label">Attach Photo / Scan</span>
+              <input type="file" id="photo-file-input" accept="image/*" class="hidden" onchange="handlePhotoUpload(this)">
+            </label>
+            <span id="photo-preview-name" class="text-[11px] text-stone-500 italic">No photo attached</span>
+          </div>
+
+          <button onclick="saveLetterToBaby()" class="w-full py-2.5 rounded-xl bg-gradient-to-r from-rose-500 to-pink-500 text-white font-bold text-xs shadow-md active:scale-95 transition flex items-center justify-center gap-1.5">
+            <span>✨</span>
+            <span>Slip Note into Memory Jar</span>
+          </button>
+        </div>
+
+        <div class="flex items-center justify-between px-1 pt-1">
+          <h4 class="text-xs font-extrabold text-stone-800 uppercase tracking-wider">Entries in the Jar</h4>
+          <div class="flex gap-1 text-xs">
+            <button onclick="filterLetters('all')" id="filter-all" class="px-2 py-0.5 rounded-md font-bold bg-rose-500 text-white">All</button>
+            <button onclick="filterLetters('Mommy')" id="filter-mom" class="px-2 py-0.5 rounded-md font-bold bg-white text-stone-600">Mommy</button>
+            <button onclick="filterLetters('Daddy')" id="filter-dad" class="px-2 py-0.5 rounded-md font-bold bg-white text-stone-600">Daddy</button>
+          </div>
+        </div>
+
+        <div id="saved-letters-container" class="space-y-2.5"></div>
+      </section>
+
+    </div>
+
+    <!-- Floating Navigation Bar -->
+    <div class="absolute bottom-3 left-4 right-4 h-16 rounded-3xl glass-card flex items-center justify-around px-2 shadow-xl border border-white/90 z-20">
+      <button id="nav-btn-home" onclick="switchTab('home')" class="flex flex-col items-center justify-center w-14 h-12 text-rose-600 transition font-bold">
+        <span class="text-base">🌱</span>
+        <span class="text-[11px] font-extrabold mt-0.5">Today</span>
+      </button>
+
+      <button id="nav-btn-calendar" onclick="switchTab('calendar')" class="flex flex-col items-center justify-center w-14 h-12 text-stone-500 hover:text-stone-800 transition">
+        <span class="text-base">📅</span>
+        <span class="text-[11px] font-bold mt-0.5">Calendar</span>
+      </button>
+
+      <button id="nav-btn-roadmap" onclick="switchTab('roadmap')" class="flex flex-col items-center justify-center w-14 h-12 text-stone-500 hover:text-stone-800 transition">
+        <span class="text-base">🗺️</span>
+        <span class="text-[11px] font-bold mt-0.5">Roadmap</span>
+      </button>
+
+      <button id="nav-btn-journal" onclick="switchTab('journal')" class="flex flex-col items-center justify-center w-14 h-12 text-stone-500 hover:text-stone-800 transition relative">
+        <span class="text-base">🫙</span>
+        <span class="text-[11px] font-bold mt-0.5">Jar</span>
+        <span id="nav-jar-dot" class="w-1.5 h-1.5 rounded-full bg-rose-500 absolute top-1 right-3.5 hidden"></span>
+      </button>
+    </div>
+
+  </div>
+
+  <!-- ================================================================= -->
+  <!-- MODALS ROOT CONTAINER (PLACED AT <body> LEVEL FOR 100% UNBLOCKED TAPS) -->
+  <!-- ================================================================= -->
+
+  <!-- 1. MASTER SETTINGS HUB MODAL -->
+  <div id="settings-modal" class="fixed inset-0 bg-stone-900/65 backdrop-blur-sm flex items-end justify-center z-[100] hidden" onclick="if(event.target===this)closeSettingsModal()">
+    <div class="glass-card w-full max-w-[430px] max-h-[85vh] overflow-y-auto no-scrollbar rounded-t-[36px] p-5 border border-white space-y-4 shadow-2xl">
+      <div class="flex items-center justify-between pb-1 border-b border-stone-200">
+        <div class="flex items-center gap-2">
+          <span class="text-lg">⚙️</span>
+          <h3 class="font-serif-title text-base font-bold text-stone-900">Sanctuary Controls</h3>
+        </div>
+        <button onclick="closeSettingsModal()" class="text-stone-400 text-2xl leading-none px-2">&times;</button>
+      </div>
+
+      <!-- Treatment Flow: Active vs Rest & Whisper Tone -->
+      <div class="p-3.5 rounded-2xl bg-white border border-stone-200 space-y-3">
+        <p class="text-[11px] font-extrabold uppercase tracking-wider text-rose-600">🕊️ Care State & Tone</p>
+        
+        <!-- Cycle Active / Hold Toggle -->
+        <div class="flex items-center justify-between">
+          <div>
+            <p class="text-xs font-bold text-stone-800">Cycle Status</p>
+            <p class="text-[10px] text-stone-500" id="setting-hold-label">Active treatment protocol</p>
+          </div>
+          <button id="setting-pause-toggle-btn" onclick="togglePauseCycle()" class="px-3 py-1.5 rounded-xl text-xs font-extrabold uppercase transition border border-rose-200 bg-rose-50 text-rose-700">
+            Active Mode
+          </button>
+        </div>
+
+        <!-- Whisper Tone Switcher -->
+        <div class="flex items-center justify-between pt-1 border-t border-stone-100">
+          <div>
+            <p class="text-xs font-bold text-stone-800">Whisper Tone</p>
+            <p class="text-[10px] text-stone-500">Baby point of view vs Soft compassion</p>
+          </div>
+          <div class="flex bg-rose-100/60 p-0.5 rounded-xl border border-white">
+            <button onclick="setGentleWordingState(false)" id="tone-btn-baby" class="px-2.5 py-1 rounded-lg text-[10px] font-bold text-stone-600">Baby</button>
+            <button onclick="setGentleWordingState(true)" id="tone-btn-soft" class="px-2.5 py-1 rounded-lg text-[10px] font-extrabold bg-white text-rose-600 shadow-2xs">Soft</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Visual & Eye Comfort (Dark Mode) -->
+      <div class="p-3.5 rounded-2xl bg-white border border-stone-200 space-y-2">
+        <div class="flex items-center justify-between">
+          <div>
+            <p class="text-xs font-bold text-stone-900">🌙 Moonlit Dark Mode</p>
+            <p class="text-[11px] text-stone-500">Softer on the eyes during late night injections</p>
+          </div>
+          <label class="relative inline-flex items-center cursor-pointer">
+            <input type="checkbox" id="setting-darkmode" onchange="updateUserSetting('darkMode', this.checked)" class="sr-only peer">
+            <div class="w-10 h-5 bg-stone-300 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-stone-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-rose-500"></div>
+          </label>
+        </div>
+      </div>
+
+      <!-- Sound & Voice Sanctuary -->
+      <div class="p-3.5 rounded-2xl bg-white border border-stone-200 space-y-3">
+        <p class="text-[11px] font-extrabold uppercase tracking-wider text-rose-600">🔊 Sound & Tone Sanctuary</p>
+        
+        <div class="flex items-center justify-between">
+          <div>
+            <p class="text-xs font-bold text-stone-800">528 Hz Chime & Logo Beep</p>
+            <p class="text-[10px] text-stone-500">Plays chime on dose checks & logo taps</p>
+          </div>
+          <input type="checkbox" id="setting-chime" onchange="updateUserSetting('soundChime', this.checked)" class="w-4 h-4 rounded text-rose-600">
+        </div>
+
+        <div class="flex items-center justify-between">
+          <div>
+            <p class="text-xs font-bold text-stone-800">Meditative Voice Prompts</p>
+            <p class="text-[10px] text-stone-500">Soft "Inhale... exhale..." voice in calm breath</p>
+          </div>
+          <input type="checkbox" id="setting-voice" onchange="updateUserSetting('soundVoice', this.checked)" class="w-4 h-4 rounded text-rose-600">
+        </div>
+
+        <div class="flex items-center justify-between">
+          <div>
+            <p class="text-xs font-bold text-stone-800">75s Hope Calm Ambient Music</p>
+            <p class="text-[10px] text-stone-500">Uplifting pentatonic ambient bell chimes</p>
+          </div>
+          <input type="checkbox" id="setting-music" onchange="updateUserSetting('soundMusic', this.checked)" class="w-4 h-4 rounded text-rose-600">
+        </div>
+
+        <div class="flex items-center justify-between">
+          <div>
+            <p class="text-xs font-bold text-stone-800">Gentle Haptic Touch</p>
+            <p class="text-[10px] text-stone-500">Soft vibration on clicks & cares</p>
+          </div>
+          <input type="checkbox" id="setting-haptics" onchange="updateUserSetting('haptics', this.checked)" class="w-4 h-4 rounded text-rose-600">
+        </div>
+      </div>
+
+      <!-- Customize Home Screen Modules -->
+      <div class="p-3.5 rounded-2xl bg-white border border-stone-200 space-y-2.5">
+        <p class="text-[11px] font-extrabold uppercase tracking-wider text-rose-600">🎛️ Customize Home Screen Modules</p>
+        <p class="text-[10px] text-stone-500">Turn modules On/Off. Layout adapts smoothly with zero gaps.</p>
+        
+        <div class="grid grid-cols-2 gap-2 text-xs pt-1">
+          <label class="flex items-center gap-2 p-2 rounded-xl bg-stone-50 border border-stone-100">
+            <input type="checkbox" id="mod-toggle-hope" onchange="updateUserSetting('showHopeCards', this.checked)">
+            <span class="font-bold text-stone-700">💌 Hope Cards</span>
+          </label>
+          <label class="flex items-center gap-2 p-2 rounded-xl bg-stone-50 border border-stone-100">
+            <input type="checkbox" id="mod-toggle-pod" onchange="updateUserSetting('showPod', this.checked)">
+            <span class="font-bold text-stone-700">🌸 Sacred Nest</span>
+          </label>
+          <label class="flex items-center gap-2 p-2 rounded-xl bg-stone-50 border border-stone-100">
+            <input type="checkbox" id="mod-toggle-wins" onchange="updateUserSetting('showWins', this.checked)">
+            <span class="font-bold text-stone-700">🌟 My Wins</span>
+          </label>
+          <label class="flex items-center gap-2 p-2 rounded-xl bg-stone-50 border border-stone-100">
+            <input type="checkbox" id="mod-toggle-whisper" onchange="updateUserSetting('showWhisper', this.checked)">
+            <span class="font-bold text-stone-700">🕊️ Whisper Card</span>
+          </label>
+          <label class="flex items-center gap-2 p-2 rounded-xl bg-stone-50 border border-stone-100 col-span-2">
+            <input type="checkbox" id="mod-toggle-team" onchange="updateUserSetting('showTeamCheckin', this.checked)">
+            <span class="font-bold text-stone-700">🤝 Team Check-In (What I Need)</span>
+          </label>
+        </div>
+      </div>
+
+      <!-- Cycle Horizon & Next Phase -->
+      <div class="p-3.5 rounded-2xl bg-white border border-stone-200 space-y-2.5">
+        <p class="text-[11px] font-extrabold uppercase tracking-wider text-rose-600">🗓️ Cycle Horizon & Next Phase</p>
+        
+        <div class="flex items-center justify-between text-xs">
+          <div>
+            <p class="font-bold text-stone-800">Timeline Length (Days)</p>
+            <p class="text-[10px] text-stone-500">Expands past 15 days if stimulation is extended</p>
+          </div>
+          <select id="setting-cycle-days" onchange="updateUserSetting('totalCycleDays', parseInt(this.value, 10))" class="p-1.5 rounded-xl border border-stone-200 text-xs font-bold text-stone-800 bg-white">
+            <option value="15">15 Days</option>
+            <option value="20">20 Days</option>
+            <option value="25">25 Days</option>
+            <option value="30">30 Days</option>
+          </select>
+        </div>
+
+        <div class="flex items-center justify-between text-xs pt-1">
+          <div>
+            <p class="font-bold text-stone-800">Treatment Phase</p>
+            <p class="text-[10px] text-stone-500">Shift to Next Phase when stimulation completes</p>
+          </div>
+          <select id="setting-cycle-phase" onchange="updateUserSetting('cyclePhase', parseInt(this.value, 10))" class="p-1.5 rounded-xl border border-stone-200 text-xs font-bold text-stone-800 bg-white">
+            <option value="1">Phase 1: Stimulation</option>
+            <option value="2">Phase 2: Lab & Womb Prep</option>
+          </select>
+        </div>
+      </div>
+
+      <button onclick="closeSettingsModal()" class="w-full py-2.5 rounded-xl bg-rose-600 text-white font-bold text-xs shadow-md active:scale-95 transition">
+        Apply Preferences
+      </button>
+    </div>
+  </div>
+
+  <!-- 2. ADD / EDIT DOSE MODAL -->
+  <div id="med-edit-modal" class="fixed inset-0 bg-stone-900/60 backdrop-blur-xs flex items-center justify-center p-4 z-[100] hidden">
+    <div class="glass-card w-full max-w-sm rounded-3xl p-5 border border-white space-y-3.5 shadow-2xl">
+      <div class="flex items-center justify-between">
+        <h3 id="med-edit-title" class="font-serif-title text-base font-bold text-stone-900">Edit Miracle Step</h3>
+        <button onclick="closeMedEditModal()" class="text-stone-400 text-xl font-bold hover:text-stone-700">&times;</button>
+      </div>
+      
+      <input type="hidden" id="edit-med-id">
+
+      <div class="space-y-2.5 text-xs">
+        <div>
+          <label class="block text-xs font-bold text-stone-700 mb-1">Medication / Step Name</label>
+          <input type="text" id="input-med-name" placeholder="e.g. Inj. Recagon / Gonal F" class="w-full p-2.5 rounded-xl bg-white border border-stone-200 font-bold text-stone-800">
+        </div>
+        <div class="grid grid-cols-2 gap-2">
+          <div>
+            <label class="block text-xs font-bold text-stone-700 mb-1">Scheduled Time</label>
+            <input type="text" id="input-med-time" placeholder="07:00 PM" class="w-full p-2.5 rounded-xl bg-white border border-stone-200 font-bold text-stone-800">
+          </div>
+          <div>
+            <label class="block text-xs font-bold text-stone-700 mb-1">Dosage</label>
+            <input type="text" id="input-med-dose" placeholder="e.g. 225 IU or 1 Tab" class="w-full p-2.5 rounded-xl bg-white border border-stone-200 font-bold text-stone-800">
+          </div>
+        </div>
+        <div>
+          <label class="block text-xs font-bold text-stone-700 mb-1">Encouraging Note / Instructions</label>
+          <input type="text" id="input-med-note" placeholder="e.g. Courage Injection ✨ Follicle booster" class="w-full p-2.5 rounded-xl bg-white border border-stone-200 font-medium text-stone-800">
+        </div>
+        <div class="flex items-center gap-2 pt-1">
+          <input type="checkbox" id="input-med-isinj" class="w-4 h-4 rounded text-rose-600 focus:ring-rose-500">
+          <label for="input-med-isinj" class="text-xs font-bold text-stone-700">This is an injection shot 💉</label>
+        </div>
+      </div>
+
+      <div class="flex gap-2 pt-1">
+        <button onclick="saveMedEdit()" class="flex-1 py-2.5 rounded-xl bg-rose-600 text-white font-bold text-xs shadow-md active:scale-95 transition">
+          Save Miracle Step
+        </button>
+        <button id="delete-med-btn" onclick="deleteMedItem()" class="py-2.5 px-3 rounded-xl bg-stone-100 text-rose-600 font-bold text-xs">
+          Delete
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- 3. ADD CUSTOM CALENDAR NOTE MODAL -->
+  <div id="cal-note-modal" class="fixed inset-0 bg-stone-900/60 backdrop-blur-xs flex items-center justify-center p-4 z-[100] hidden">
+    <div class="glass-card w-full max-w-sm rounded-3xl p-5 border border-white space-y-3.5 shadow-2xl">
+      <div class="flex items-center justify-between">
+        <h3 id="cal-note-modal-title" class="font-serif-title text-base font-bold text-stone-900">Add Day Care Note</h3>
+        <button onclick="closeCalNoteModal()" class="text-stone-400 text-xl font-bold hover:text-stone-700">&times;</button>
+      </div>
+      <input type="hidden" id="cal-note-target-date">
+      <input type="text" id="cal-note-input" placeholder="e.g. Clinic blood draw at 9:00 AM, rest after" class="w-full p-3 rounded-xl bg-white border border-stone-200 text-xs font-medium text-stone-800">
+      <button onclick="saveCalendarNote()" class="w-full py-2.5 rounded-xl bg-rose-600 text-white font-bold text-xs shadow-md">
+        Save Note on Calendar
+      </button>
+    </div>
+  </div>
+
+  <!-- 4. CLINIC MILESTONES MODAL -->
+  <div id="milestones-modal" class="fixed inset-0 bg-stone-900/60 backdrop-blur-xs flex items-center justify-center p-4 z-[100] hidden">
+    <div class="glass-card w-full max-w-sm rounded-3xl p-5 border border-white space-y-3.5 shadow-2xl">
+      <div class="flex items-center justify-between">
+        <h3 class="font-serif-title text-base font-bold text-stone-900">Edit Clinical Milestones</h3>
+        <button onclick="closeMilestonesModal()" class="text-stone-400 text-xl font-bold hover:text-stone-700">&times;</button>
+      </div>
+      <p class="text-xs text-stone-600 leading-snug">
+        Plans adjust after follicle scans. Enter the exact dates confirmed by your clinic.
+      </p>
+      
+      <div class="space-y-2.5 text-xs">
+        <div>
+          <label class="block text-xs font-bold text-stone-700 mb-1">Follicle Ultrasound Scan (as told by clinic)</label>
+          <input type="date" id="input-milestone-scan" class="w-full p-2 rounded-xl bg-white border border-stone-200 font-bold text-stone-800">
+        </div>
+        <div>
+          <label class="block text-xs font-bold text-stone-700 mb-1">Trigger Shot Date (as told by clinic)</label>
+          <input type="date" id="input-milestone-trigger" class="w-full p-2 rounded-xl bg-white border border-stone-200 font-bold text-stone-800">
+        </div>
+        <div>
+          <label class="block text-xs font-bold text-stone-700 mb-1">Egg Retrieval (OPU) Date</label>
+          <input type="date" id="input-milestone-retrieval" class="w-full p-2 rounded-xl bg-white border border-stone-200 font-bold text-stone-800">
+        </div>
+      </div>
+
+      <button onclick="saveMilestones()" class="w-full py-2.5 rounded-xl bg-rose-600 text-white font-bold text-xs shadow-md active:scale-95 transition">
+        Save Clinic Milestones
+      </button>
+    </div>
+  </div>
+
+  <!-- 5. KIND MISSED A DOSE MODAL -->
+  <div id="missed-dose-modal" class="fixed inset-0 bg-stone-900/60 backdrop-blur-sm flex items-center justify-center p-4 z-[100] hidden">
+    <div class="glass-card w-full max-w-sm rounded-3xl p-5 border border-white space-y-3.5 shadow-2xl">
+      <div class="flex items-center justify-between">
+        <div class="flex items-center gap-2">
+          <span class="text-xl">🕊️</span>
+          <h3 class="font-serif-title text-base font-bold text-stone-900">Take a Deep Breath</h3>
+        </div>
+        <button onclick="closeMissedDoseModal()" class="text-stone-400 text-xl font-bold hover:text-stone-700">&times;</button>
+      </div>
+      
+      <div class="p-3 bg-rose-50 border border-rose-200 rounded-2xl text-xs text-rose-900 font-medium leading-relaxed">
+        <strong>You are not failing.</strong> Clinics navigate medication timing adjustments every single day.
+      </div>
+
+      <div class="space-y-2 text-xs text-stone-700 leading-relaxed">
+        <p><strong>1. Call your clinic right away:</strong> State the exact medication and elapsed time.</p>
+        <p><strong>2. Do NOT double your dose</strong> unless your doctor explicitly confirms.</p>
+        <p><strong>3. Keep your medication box in hand</strong> when calling.</p>
+        <p><strong>4. Forgive yourself completely:</strong> One delayed dose does not erase your courage.</p>
+      </div>
+
+      <div class="pt-1 flex gap-2">
+        <button onclick="closeMissedDoseModal()" class="w-full py-2.5 text-xs font-bold text-stone-700 bg-white border border-stone-200 rounded-xl">
+          Close
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- 6. HONEST PLAN CHANGES MODAL -->
+  <div id="plan-changes-modal" class="fixed inset-0 bg-stone-900/60 backdrop-blur-sm flex items-center justify-center p-4 z-[100] hidden">
+    <div class="glass-card w-full max-w-sm max-h-[85vh] overflow-y-auto rounded-3xl p-5 border border-white space-y-3 shadow-2xl">
+      <div class="flex items-center justify-between">
+        <div class="flex items-center gap-2">
+          <span class="text-xl">🌱</span>
+          <h3 class="font-serif-title text-base font-bold text-stone-900">If the Plan Changes</h3>
+        </div>
+        <button onclick="closePlanChangesModal()" class="text-stone-400 text-xl font-bold hover:text-stone-700">&times;</button>
+      </div>
+
+      <div class="space-y-2.5 text-xs text-stone-800">
+        <div class="p-3 bg-white rounded-2xl border border-stone-200">
+          <h5 class="font-bold text-stone-900">🌱 Slow Follicle Growth</h5>
+          <p class="text-stone-600 mt-1 leading-snug">Follicles grow like flowers—some bloom faster, some take extra days. Clinics frequently add 2–3 stim days to optimize maturity.</p>
+        </div>
+
+        <div class="p-3 bg-white rounded-2xl border border-stone-200">
+          <h5 class="font-bold text-stone-900">❄️ Freeze-All Cycle</h5>
+          <p class="text-stone-600 mt-1 leading-snug">If estrogen is elevated, a freeze-all avoids hyperstimulation (OHSS) and lets the uterine lining reset for transfer.</p>
+        </div>
+
+        <div class="p-3 bg-white rounded-2xl border border-stone-200">
+          <h5 class="font-bold text-stone-900">💔 Paused Cycle</h5>
+          <p class="text-stone-600 mt-1 leading-snug">A paused cycle is not a failure of your body—it is your medical team protecting your safety to begin fresh with a tailored plan.</p>
+        </div>
+      </div>
+
+      <button onclick="closePlanChangesModal()" class="w-full py-2.5 text-xs font-bold text-stone-800 bg-white border border-stone-200 rounded-xl">
+        I Understand, Thank You
+      </button>
+    </div>
+  </div>
+
+  <!-- 7. TWO-TAP HOW ARE WE MODAL -->
+  <div id="how-are-we-modal" class="fixed inset-0 bg-stone-900/60 backdrop-blur-sm flex items-center justify-center p-4 z-[100] hidden">
+    <div class="glass-card w-full max-w-sm rounded-3xl p-5 border border-white space-y-3 shadow-2xl">
+      <div class="flex items-center justify-between">
+        <h3 class="font-serif-title text-base font-bold text-stone-900">How Are We Today? 🤍</h3>
+        <button onclick="closeHowAreWeModal()" class="text-stone-400 text-xl font-bold hover:text-stone-700">&times;</button>
+      </div>
+      <p class="text-xs text-stone-600">A quick two-tap check-in for the two of you.</p>
+
+      <div class="space-y-1.5">
+        <label class="text-[11px] font-extrabold uppercase tracking-wider text-rose-600">1. Mommy is feeling:</label>
+        <div class="grid grid-cols-3 gap-1.5 text-xs" id="mom-mood-btns">
+          <button onclick="selectMomMood(this, 'Tender 🌧️')" class="p-2 rounded-xl bg-white border border-stone-200 font-bold">Tender 🌧️</button>
+          <button onclick="selectMomMood(this, 'Brave 🦁')" class="p-2 rounded-xl bg-white border border-stone-200 font-bold">Brave 🦁</button>
+          <button onclick="selectMomMood(this, 'Tired 💤')" class="p-2 rounded-xl bg-white border border-stone-200 font-bold">Tired 💤</button>
+        </div>
+      </div>
+
+      <div class="space-y-1.5 pt-1">
+        <label class="text-[11px] font-extrabold uppercase tracking-wider text-rose-600">2. Partner is feeling:</label>
+        <div class="grid grid-cols-3 gap-1.5 text-xs" id="partner-mood-btns">
+          <button onclick="selectPartnerMood(this, 'Steady ⚓')" class="p-2 rounded-xl bg-white border border-stone-200 font-bold">Steady ⚓</button>
+          <button onclick="selectPartnerMood(this, 'Here for you 🤍')" class="p-2 rounded-xl bg-white border border-stone-200 font-bold">Here 🤍</button>
+          <button onclick="selectPartnerMood(this, 'Worried 🌿')" class="p-2 rounded-xl bg-white border border-stone-200 font-bold">Worried 🌿</button>
+        </div>
+      </div>
+
+      <div id="harmony-result-card" class="hidden p-3 rounded-2xl bg-white border border-rose-200 text-xs text-stone-800 leading-relaxed italic text-center"></div>
+
+      <button onclick="saveHowAreWeCheckin()" class="w-full py-2.5 rounded-xl bg-rose-600 text-white font-bold text-xs shadow-md active:scale-95 transition">
+        Record Today's Harmony
+      </button>
+    </div>
+  </div>
+
+  <!-- 8. 75s HOPE VISUALIZATION MODAL -->
+  <div id="hope-vis-modal" class="fixed inset-0 bg-stone-900/80 backdrop-blur-md flex items-center justify-center p-4 z-[100] hidden">
+    <div class="glass-card w-full max-w-xs rounded-3xl p-6 border border-white text-center space-y-4 shadow-2xl">
+      <div class="flex justify-between items-center">
+        <span class="text-xs font-extrabold text-rose-600 uppercase tracking-wider">75s Guided Hope Calm</span>
+        <button onclick="closeHopeVisualization()" class="text-stone-400 text-xl font-bold">&times;</button>
+      </div>
+      
+      <div class="my-4 flex justify-center items-center h-36">
+        <div class="w-28 h-28 rounded-full breathing-orb flex items-center justify-center text-white text-xs font-bold shadow-xl p-2 text-center">
+          <span id="hope-vis-countdown">75s</span>
+        </div>
+      </div>
+
+      <p id="hope-vis-step-text" class="text-xs font-serif-title italic text-stone-800 min-h-[50px] leading-relaxed">
+        "Soften your shoulders. Breathe in calm, breathe out tension."
+      </p>
+
+      <div class="w-full bg-stone-200 h-1.5 rounded-full overflow-hidden">
+        <div id="hope-vis-progress" class="bg-rose-500 h-full transition-all duration-1000" style="width: 0%;"></div>
+      </div>
+
+      <div class="flex items-center justify-center gap-3 pt-1">
+        <button id="hope-audio-toggle" onclick="toggleHopeAudio()" class="text-[11px] font-bold text-rose-600 bg-rose-50 px-3 py-1 rounded-full border border-rose-200">
+          🎵 Music: ON
+        </button>
+        <button onclick="closeHopeVisualization()" class="text-xs font-bold text-stone-500 hover:text-stone-800">
+          Finish
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- 9. PIN PRIVACY MODAL -->
+  <div id="pin-modal" class="fixed inset-0 bg-stone-900/70 backdrop-blur-md flex items-center justify-center p-4 z-[100] hidden">
+    <div class="glass-card w-full max-w-xs rounded-3xl p-6 border border-white space-y-4 shadow-2xl text-center">
+      <div class="flex justify-between items-center">
+        <h3 class="font-serif-title text-base font-bold text-stone-900">Light PIN Privacy</h3>
+        <button onclick="closePinModal()" class="text-stone-400 text-xl font-bold">&times;</button>
+      </div>
+      <p class="text-xs text-stone-600 leading-snug">
+        Set a 4-digit PIN for casual privacy. (Light interface protection, not encryption).
+      </p>
+      
+      <input type="password" maxlength="4" id="pin-input-field" placeholder="Enter 4 digits" class="w-36 mx-auto text-center text-lg tracking-widest p-2 rounded-xl bg-white border border-stone-200 font-bold text-stone-900">
+      
+      <div class="flex gap-2">
+        <button onclick="savePinCode()" class="flex-1 py-2.5 rounded-xl bg-rose-600 text-white font-bold text-xs shadow-xs">
+          Save PIN
+        </button>
+        <button onclick="removePinCode()" class="py-2.5 px-3 rounded-xl bg-white text-stone-600 border border-stone-200 font-bold text-xs">
+          Turn Off
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- 10. LOCK SCREEN OVERLAY -->
+  <div id="lock-screen-overlay" class="fixed inset-0 bg-stone-900/95 backdrop-blur-lg flex flex-col items-center justify-center p-6 z-[120] hidden">
+    <div class="glass-card w-full max-w-xs rounded-3xl p-6 text-center space-y-4 shadow-2xl border border-white">
+      <span class="text-3xl">🌸</span>
+      <h3 class="font-serif-title text-lg font-bold text-stone-900">DSR Hope</h3>
+      <p class="text-xs text-stone-600">Enter your 4-digit PIN to open</p>
+      <input type="password" maxlength="4" id="unlock-pin-field" class="w-36 mx-auto text-center text-xl tracking-widest p-2 rounded-xl bg-white border border-stone-300 font-bold text-stone-900">
+      <button onclick="attemptUnlock()" class="w-full py-2.5 rounded-xl bg-rose-600 text-white font-bold text-xs shadow-md">
+        Unlock Sanctuary
+      </button>
+    </div>
+  </div>
+
+  <!-- SYNC AUTH OVERLAY (Phase 3) -->
+  <div id="sync-auth-overlay" class="fixed inset-0 bg-stone-900/90 backdrop-blur-md flex flex-col items-center justify-center p-5 z-[130] hidden">
+    <div class="glass-card w-full max-w-sm rounded-3xl p-5 border border-white space-y-4 shadow-2xl">
+      <div class="text-center space-y-1">
+        <span class="text-3xl">🌸</span>
+        <h3 class="font-serif-title text-lg font-bold text-stone-900">Link Your Phones</h3>
+        <p class="text-xs text-stone-600">Private sync for the two of you only</p>
+      </div>
+
+      <div id="auth-step-login" class="space-y-3">
+        <input id="auth-email" type="email" placeholder="Your email" class="w-full text-xs p-2.5 rounded-xl bg-white border border-stone-200 text-stone-900">
+        <input id="auth-password" type="password" placeholder="Password (min 6 chars)" class="w-full text-xs p-2.5 rounded-xl bg-white border border-stone-200 text-stone-900">
+        <button onclick="authSignIn()" class="w-full py-2.5 rounded-xl bg-rose-600 text-white font-bold text-xs">Sign In</button>
+        <button onclick="authSignUp()" class="w-full py-2.5 rounded-xl bg-white border border-rose-200 text-rose-700 font-bold text-xs">Create Account</button>
+        <p id="auth-msg" class="text-[11px] text-center text-stone-500"></p>
+      </div>
+
+      <div id="auth-step-couple" class="space-y-3 hidden">
+        <p class="text-xs text-stone-700 text-center">Signed in. Create a couple or join with an invite code.</p>
+        <button onclick="createCouple()" class="w-full py-2.5 rounded-xl bg-rose-600 text-white font-bold text-xs">I’m the first phone — Create Couple</button>
+        <div class="flex gap-2">
+          <input id="auth-invite" type="text" placeholder="Invite code" class="flex-1 text-xs p-2.5 rounded-xl bg-white border border-stone-200 text-stone-900 uppercase tracking-wider">
+          <button onclick="joinCouple()" class="px-4 py-2.5 rounded-xl bg-emerald-600 text-white font-bold text-xs">Join</button>
+        </div>
+        <p id="auth-couple-msg" class="text-[11px] text-center text-stone-500"></p>
+        <button onclick="authSignOut()" class="w-full py-2 text-[11px] font-bold text-stone-500">Sign out</button>
+      </div>
+
+      <div id="auth-step-ready" class="space-y-3 hidden text-center">
+        <p class="text-sm font-bold text-emerald-700">Linked ✓</p>
+        <p id="auth-role-label" class="text-xs text-stone-600"></p>
+        <p id="auth-invite-display" class="text-xs font-mono bg-rose-50 border border-rose-100 rounded-xl p-2 hidden"></p>
+        <button onclick="closeAuthOverlay()" class="w-full py-2.5 rounded-xl bg-rose-600 text-white font-bold text-xs">Continue to App</button>
+        <button onclick="registerPush()" class="w-full py-2 rounded-xl bg-white border border-stone-200 text-stone-700 font-bold text-xs">Enable Notifications</button>
+        <button onclick="authSignOut()" class="w-full py-2 text-[11px] font-bold text-stone-500">Sign out</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- 11. PROTOCOL EDIT MODAL -->
+  <div id="protocol-modal" class="fixed inset-0 bg-black/40 backdrop-blur-xs flex items-center justify-center p-4 z-[100] hidden">
+    <div class="glass-card w-full max-w-sm rounded-3xl p-5 border border-white space-y-3.5 shadow-2xl">
+      <div class="flex items-center justify-between">
+        <h3 class="font-serif-title text-base font-bold text-stone-900">Update Protocol</h3>
+        <button onclick="closeProtocolModal()" class="text-stone-400 text-lg hover:text-stone-700">&times;</button>
+      </div>
+      <div class="space-y-2 text-xs">
+        <div>
+          <label class="block text-xs font-bold text-stone-700 mb-1">Cycle Start Date (Day 1)</label>
+          <input type="date" id="edit-start-date" class="w-full p-2.5 rounded-xl bg-white border border-stone-200 font-bold text-stone-800">
+        </div>
+        <div>
+          <label class="block text-xs font-bold text-stone-700 mb-1">Inj. Recagon / Gonal F Dosage (IU)</label>
+          <input type="text" id="edit-gonal-dose" value="225 IU" class="w-full p-2.5 rounded-xl bg-white border border-stone-200 font-bold text-stone-800">
+        </div>
+        <div>
+          <label class="block text-xs font-bold text-stone-700 mb-1">Evening Injection Time</label>
+          <input type="time" id="edit-injection-time" value="19:00" class="w-full p-2.5 rounded-xl bg-white border border-stone-200 font-bold text-stone-800">
+        </div>
+      </div>
+      <button onclick="saveProtocolUpdates()" class="w-full py-2.5 rounded-xl bg-rose-600 text-white font-bold text-xs shadow-md active:scale-95 transition">
+        Apply Doctor's Update
+      </button>
+    </div>
+  </div>
+
+  <!-- 12. CALM HUB & MEDITATION MODAL -->
+  <div id="calm-modal" class="fixed inset-0 z-[100] bg-black/40 backdrop-blur-xs flex items-end justify-center hidden" onclick="if(event.target===this)closeCalm()">
+    <div class="w-full max-w-md max-h-[88vh] overflow-y-auto rounded-t-3xl bg-rose-50/95 p-5 shadow-2xl">
+      <div class="flex justify-between items-center mb-3">
+        <h3 class="text-sm font-extrabold text-stone-900">🧘 Calm & Meditation Sanctuary</h3>
+        <button onclick="closeCalm()" class="text-stone-500 text-2xl leading-none px-2">&times;</button>
+      </div>
+      <div id="calm-body" class="space-y-2"></div>
+    </div>
+  </div>
+
+  <!-- 13. 4-7-8 CALM BREATHING MODAL -->
+  <div id="breathing-modal" class="fixed inset-0 bg-stone-900/60 backdrop-blur-sm flex items-center justify-center p-4 z-[100] hidden">
+    <div class="glass-card w-full max-w-xs rounded-3xl p-6 border border-white text-center space-y-4 shadow-2xl">
+      <div class="flex justify-between items-center">
+        <span class="text-xs font-bold text-rose-600 uppercase tracking-wider">4-7-8 Guided Breathing</span>
+        <button onclick="closeBreathingModal()" class="text-stone-400 text-lg">&times;</button>
+      </div>
+      <div class="my-6 flex justify-center items-center h-36">
+        <div class="w-28 h-28 rounded-full breathing-orb flex items-center justify-center text-white text-xs font-bold shadow-xl">
+          <span id="modal-breathing-prompt">Breathe In</span>
+        </div>
+      </div>
+      <p class="text-xs text-stone-700 italic">"Inhale strength (4s)... hold love (7s)... release worry (8s)."</p>
+      <div class="flex justify-center gap-2">
+        <button id="breath-voice-toggle" onclick="toggleBreathVoice()" class="text-[11px] font-bold text-rose-600 bg-rose-50 px-3 py-1 rounded-full border border-rose-200">
+          🗣️ Gentle Voice: ON
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    /* =========================================================
+       PHASE 1 — LOCAL-FIRST STATE ARCHITECTURE
+       Shared fields will later sync via Supabase.
+       Per-device fields stay only on this phone.
+       ========================================================= */
+    const STORAGE_KEY = 'bloom_ivf_state';
+    const OUTBOX_KEY  = 'bloom_ivf_outbox';
+
+    // ---- SHARED (will sync between the two phones) ----
+    let cycleStartDateStr = '2026-09-27';
+    let stimStartDate = new Date(2026, 8, 27);
+    let isPaused = false;
+    let isRestMonthActive = false;
+    let completedMeds = {};
+    let savedLetters = [];
+    let routineMeds = [
+      { id: 'med1', time: '08:00 AM', name: 'Tab. Medroxyprogesterone Acetate', dose: '10mg', note: 'As prescribed', isInjection: false },
+      { id: 'med2', time: '10:00 AM', name: 'Tab. Predmet 4mg (Dose 1) + Nutrition', dose: '1 Tab', note: 'CoQ10, Folic Acid & Calshine', isInjection: false },
+      { id: 'med3', time: '02:00 PM', name: 'Tab. Predmet 4mg (Dose 2)', dose: '1 Tab', note: 'Immune balance', isInjection: false },
+      { id: 'med4', time: '07:00 PM', name: 'Inj. Recagon / Gonal F', dose: '225 IU', note: 'Courage Injection ✨ Follicle booster', isInjection: true },
+      { id: 'med5', time: '08:30 PM', name: 'Tab. Metformin 500mg + Gestinova', dose: '1 Tab + 1 Sachet', note: 'Metabolic balance', isInjection: false },
+      { id: 'med6', time: '10:00 PM', name: 'Tab. Predmet 4mg (Dose 3) + Metformin', dose: '1 Tab + 1 Tab', note: 'Quiet recovery', isInjection: false },
+    ];
+    let clinicPhone = '';
+    let questions = [];
+    let milestones = {
+      scanDate: '2026-10-04',
+      triggerDate: '',
+      retrievalDate: ''
+    };
+    let selectedNeeds = [];
+    let partnerAppreciation = '';
+    let momMood = '';
+    let partnerMood = '';
+    let customCalNotes = {};
+
+    // ---- PER-DEVICE (never leave this phone) ----
+    let selectedDay = 1;
+    let hopeTone = 'Just today';
+    let gentleWording = true;
+    let appPin = '';
+    let hardDay = false;
+    let userSettings = {
+      darkMode: false,
+      soundChime: true,
+      soundVoice: true,
+      soundMusic: true,
+      haptics: true,
+      totalCycleDays: 15,
+      cyclePhase: 1,
+      showHopeCards: true,
+      showPod: true,
+      showWins: true,
+      showWhisper: true,
+      showTeamCheckin: true
+    };
+
+    // ---- LOCAL-FIRST OUTBOX (ready for Phase 3 sync) ----
+    let outbox = [];
+    let lastSyncAt = null;
+    let deviceId = null;
+
+    // Transient UI state (never persisted)
+    let currentAuthor = 'Mommy';
+    let currentTag = '💉 Brave Shot';
+    let attachedPhotoBase64 = null;
+    let currentFilter = 'all';
+    let calDisplayDate = new Date(stimStartDate);
+
+    function ensureDeviceId() {
+      if (deviceId) return deviceId;
+      try {
+        deviceId = localStorage.getItem('bloom_device_id');
+        if (!deviceId) {
+          deviceId = 'dev_' + Math.random().toString(36).slice(2) + Date.now().toString(36);
+          localStorage.setItem('bloom_device_id', deviceId);
+        }
+      } catch (e) {
+        deviceId = 'dev_temp_' + Date.now();
+      }
+      return deviceId;
+    }
+
+    function enqueueOutbox(op, kind, key, value) {
+      const entry = {
+        id: 'ob_' + Date.now() + '_' + Math.random().toString(36).slice(2, 7),
+        op: op,
+        kind: kind,
+        key: key,
+        value: value,
+        ts: new Date().toISOString(),
+        deviceId: ensureDeviceId()
+      };
+      outbox.push(entry);
+      try { localStorage.setItem(OUTBOX_KEY, JSON.stringify(outbox)); } catch (e) {}
+    }
+
+    const BABY_LETTERS = {
+      1: "Mommy, Daddy, today our sacred story begins. Thank you for taking this brave first step for me.",
+      2: "Mommy, I can feel your deep love and gentle warmth. Every single drop brings me closer to you.",
+      3: "You are doing so wonderfully! Daddy's gentle support and your courage make me feel safe.",
+      4: "My little nest is preparing. Your body is doing sacred work today.",
+      5: "We are one-third of the way through stimulation! Keep breathing deep.",
+      6: "Two more days until our big scan! I am cheering for your growing follicles.",
+      7: "Rest early tonight, Mommy. Tomorrow we peek inside at our journey!",
+      8: "Scan Day! 🌟 Look at all the miracles your courage has created.",
+      9: "You've crossed the halfway mark! Every shot was a badge of pure unconditional love.",
+      10: "Growing strong! Mommy, your patience is my greatest blessing.",
+      11: "Almost at the finish line of stimulation! Just a few more brave drops.",
+      12: "You are my hero, Mommy. We are so very close to retrieval day.",
+      13: "Getting ready for the golden trigger shot soon. Breathe in peace.",
+      14: "Rest easy tonight. Look how far your courageous heart has brought us.",
+      15: "In full bloom! 🌸 Every drop was woven from unconditional devotion."
+    };
+
+    const GENTLE_AFFIRMATIONS = {
+      1: "Your body is doing sacred, brave work today. Take this hour one single breath at a time.",
+      2: "One breath, one step, one moment of tenderness. You don't have to feel strong every second.",
+      3: "Softening your shoulders, unclenched jaw. You are safe in this quiet room right now.",
+      4: "Your worth is not measured by ultrasound screens or numbers. You are whole and loved.",
+      5: "You only have to carry this single hour. Nothing more is asked of you.",
+      6: "Kindness towards your body is the deepest medicine today. Rest gently.",
+      7: "Quiet hearts heal fastest. Let Daddy wrap you in warmth tonight.",
+      8: "Scan day. Whatever the screen shows, you are doing everything possible with grace.",
+      9: "Halfway through. Acknowledge the immense courage your body has shown.",
+      10: "Patience is quiet strength. Allow yourself to rest and say no to anything draining.",
+      11: "Softness where there was tension. You have carried so much.",
+      12: "You are allowed to feel both scared and hopeful at the same time.",
+      13: "Breathing slowly. Releasing tomorrow, resting right here in today.",
+      14: "Surround yourself in quiet comfort tonight. You have been so steady.",
+      15: "In full grace. Honoring every step, every ounce of love poured in."
+    };
+
+    const HOPE_CARDS_DECK = {
+      'Hopeful': [
+        "Hope is a direction, not a promise.",
+        "Every tiny seed grows in the quiet, gentle dark.",
+        "You are creating room in your life and heart for miracles.",
+        "Holding hope does not require you to be completely fearless.",
+        "Gentle waters carve deep rivers. Your steady love is powerful."
+      ],
+      'Steady': [
+        "You only have to carry this single hour.",
+        "Your worth is never measured by ultrasound screens or blood draws.",
+        "You are allowed to feel both scared and brave at the same time.",
+        "Your body is doing hard, sacred work. Soften where you can.",
+        "You do not have to carry the whole mountain today. Just this one breath."
+      ],
+      'Just today': [
+        "Just today, get through the next step.",
+        "You don't have to feel positive. Just be gentle with your body.",
+        "Nothing is required of you right now except to rest and breathe.",
+        "One breath in, one breath out. That is completely enough.",
+        "Let the tears come if they need to. You are safe here."
+      ]
+    };
+
+    const PROMPT_IDEAS = [
+      "What is one thing your partner did today that made you feel supported?",
+      "If our baby were listening right now, what lullaby or prayer would you whisper?",
+      "How did you feel after tonight's courage injection was over?",
+      "What are you most excited to teach our baby one day?",
+      "Write a short thank-you note to your own body for working so hard today."
+    ];
+
+    function getTodayDay() {
+      const now = new Date();
+      now.setHours(0,0,0,0);
+      const start = new Date(stimStartDate);
+      start.setHours(0,0,0,0);
+      const diffDays = Math.round((now - start) / 864e5) + 1;
+      return Math.min(userSettings.totalCycleDays, Math.max(1, diffDays));
+    }
+
+    let audioCtx = null;
+    function getAudioContext() {
+      if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+      if (audioCtx.state === 'suspended') audioCtx.resume();
+      return audioCtx;
+    }
+
+    function playLoveChime() {
+      if (!userSettings.soundChime) return;
+      try {
+        const ctx = getAudioContext();
+        const osc = ctx.createOscillator();
+        const gain = ctx.createGain();
+        osc.type = 'sine';
+        osc.frequency.setValueAtTime(528, ctx.currentTime);
+        gain.gain.setValueAtTime(0.12, ctx.currentTime);
+        gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 1.4);
+        osc.connect(gain);
+        gain.connect(ctx.destination);
+        osc.start();
+        osc.stop(ctx.currentTime + 1.4);
+      } catch (e) {}
+    }
+
+    function goHomeToday() {
+      switchTab('home');
+      selectedDay = getTodayDay();
+      renderDayPills();
+      renderDailyView();
+      const sc = document.getElementById('scroll-container');
+      if (sc) sc.scrollTop = 0;
+      scrollToActiveDayPill();
+      if (userSettings.soundChime) playLoveChime();
+      if (userSettings.haptics && navigator.vibrate) navigator.vibrate(30);
+      showToast("🌸 Welcome home to Today.");
+    }
+
+    let hopeMusicInterval = null;
+    function startHopeMusic() {
+      if (!userSettings.soundMusic) return;
+      stopHopeMusic();
+      const ctx = getAudioContext();
+      const notes = [261.63, 329.63, 392.00, 493.88, 523.25, 587.33, 659.25, 783.99];
+      let step = 0;
+
+      function playBell(freq, duration = 1.6) {
+        if (!ctx) return;
+        const osc = ctx.createOscillator();
+        const gain = ctx.createGain();
+        osc.type = 'triangle';
+        osc.frequency.setValueAtTime(freq, ctx.currentTime);
+        gain.gain.setValueAtTime(0.06, ctx.currentTime);
+        gain.gain.exponentialRampToValueAtTime(0.0001, ctx.currentTime + duration);
+        osc.connect(gain);
+        gain.connect(ctx.destination);
+        osc.start();
+        osc.stop(ctx.currentTime + duration);
+      }
+
+      hopeMusicInterval = setInterval(() => {
+        if (!userSettings.soundMusic) return;
+        const f1 = notes[step % notes.length];
+        const f2 = notes[(step + 2) % notes.length];
+        playBell(f1, 2.0);
+        setTimeout(() => playBell(f2, 1.8), 260);
+        step++;
+      }, 950);
+    }
+
+    function stopHopeMusic() {
+      if (hopeMusicInterval) {
+        clearInterval(hopeMusicInterval);
+        hopeMusicInterval = null;
+      }
+    }
+
+    function toggleHopeAudio() {
+      userSettings.soundMusic = !userSettings.soundMusic;
+      saveState();
+      const btn = document.getElementById('hope-audio-toggle');
+      if (btn) btn.innerText = userSettings.soundMusic ? '🎵 Music: ON' : '🔇 Music: OFF';
+      if (!userSettings.soundMusic) stopHopeMusic();
+      else startHopeMusic();
+    }
+
+    function playBreathTone(type) {
+      if (!userSettings.soundChime) return;
+      try {
+        const ctx = getAudioContext();
+        const osc = ctx.createOscillator();
+        const gain = ctx.createGain();
+        osc.type = 'sine';
+        
+        if (type === 'inhale') {
+          osc.frequency.setValueAtTime(260, ctx.currentTime);
+          osc.frequency.exponentialRampToValueAtTime(432, ctx.currentTime + 3.8);
+          gain.gain.setValueAtTime(0.01, ctx.currentTime);
+          gain.gain.linearRampToValueAtTime(0.08, ctx.currentTime + 3.5);
+          gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 4.0);
+          osc.start();
+          osc.stop(ctx.currentTime + 4.0);
+        } else if (type === 'exhale') {
+          osc.frequency.setValueAtTime(432, ctx.currentTime);
+          osc.frequency.exponentialRampToValueAtTime(216, ctx.currentTime + 6.0);
+          gain.gain.setValueAtTime(0.08, ctx.currentTime);
+          gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 6.5);
+          osc.start();
+          osc.stop(ctx.currentTime + 6.5);
+        }
+        osc.connect(gain);
+        gain.connect(ctx.destination);
+      } catch (e) {}
+    }
+
+    function speakSoftly(text) {
+      if (!userSettings.soundVoice) return;
+      try {
+        if ('speechSynthesis' in window) {
+          window.speechSynthesis.cancel();
+          const u = new SpeechSynthesisUtterance(text);
+          u.rate = 0.85;
+          u.pitch = 1.05;
+          u.volume = 0.75;
+          window.speechSynthesis.speak(u);
+        }
+      } catch (e) {}
+    }
+
+    function toggleBreathVoice() {
+      userSettings.soundVoice = !userSettings.soundVoice;
+      saveState();
+      const btn = document.getElementById('breath-voice-toggle');
+      if (btn) btn.innerText = userSettings.soundVoice ? '🗣️ Gentle Voice: ON' : '🔇 Gentle Voice: OFF';
+    }
+
+    function timeToMinutes(tStr) {
+      if (!tStr) return 0;
+      const m = /(\d+):(\d+)\s*(AM|PM)/i.exec(tStr);
+      if (!m) return 0;
+      let h = parseInt(m[1], 10);
+      const min = parseInt(m[2], 10);
+      const ampm = m[3].toUpperCase();
+      if (ampm === 'PM' && h < 12) h += 12;
+      if (ampm === 'AM' && h === 12) h = 0;
+      return h * 60 + min;
+    }
+
+    function sortRoutineMeds() {
+      routineMeds.sort((a, b) => timeToMinutes(a.time) - timeToMinutes(b.time));
+    }
+
+    /* =========================================================
+       SETTINGS HUB MANAGEMENT & MODULAR DISPLAY
+       ========================================================= */
+    function openSettingsModal() {
+      document.getElementById('setting-darkmode').checked = userSettings.darkMode;
+      document.getElementById('setting-chime').checked = userSettings.soundChime;
+      document.getElementById('setting-voice').checked = userSettings.soundVoice;
+      document.getElementById('setting-music').checked = userSettings.soundMusic;
+      document.getElementById('setting-haptics').checked = userSettings.haptics;
+      
+      document.getElementById('mod-toggle-hope').checked = userSettings.showHopeCards;
+      document.getElementById('mod-toggle-pod').checked = userSettings.showPod;
+      document.getElementById('mod-toggle-wins').checked = userSettings.showWins;
+      document.getElementById('mod-toggle-whisper').checked = userSettings.showWhisper;
+      document.getElementById('mod-toggle-team').checked = userSettings.showTeamCheckin;
+
+      document.getElementById('setting-cycle-days').value = String(userSettings.totalCycleDays);
+      document.getElementById('setting-cycle-phase').value = String(userSettings.cyclePhase);
+
+      updatePauseBannerUI();
+      updateGentleWordingUI();
+
+      document.getElementById('settings-modal').classList.remove('hidden');
+    }
+
+    function closeSettingsModal() {
+      document.getElementById('settings-modal').classList.add('hidden');
+    }
+
+    function updateUserSetting(key, val) {
+      userSettings[key] = val;
+      saveState();
+      applySettings();
+    }
+
+    function applySettings() {
+      document.body.classList.toggle('dark-theme', !!userSettings.darkMode);
+
+      const toggleEl = (id, show) => {
+        const el = document.getElementById(id);
+        if (el) el.classList.toggle('hidden', !show);
+      };
+      toggleEl('mod-hope-cards', userSettings.showHopeCards);
+      toggleEl('mod-sanctuary-pod', userSettings.showPod);
+      toggleEl('mod-my-wins', userSettings.showWins);
+      toggleEl('mod-whisper-card', userSettings.showWhisper);
+      toggleEl('mod-team-checkin', userSettings.showTeamCheckin);
+
+      const pLabel = document.getElementById('timeline-phase-label');
+      if (pLabel) {
+        pLabel.innerText = userSettings.cyclePhase === 2 ? 'PHASE 2: LAB & RECOVERY' : 'STIMULATION TIMELINE';
+      }
+
+      renderDayPills();
+      renderDailyView();
+      renderCalendar();
+      updateDueDateCalculation();
+    }
+
+    function setGentleWordingState(isSoft) {
+      gentleWording = isSoft;
+      updateGentleWordingUI();
+      renderDailyView();
+      saveState();
+      showToast(gentleWording ? "🕊️ Soft wording mode active." : "🌸 Baby whispers mode active.");
+    }
+
+    function updateGentleWordingUI() {
+      const tag = document.getElementById('whisper-header-tag');
+      if (tag) tag.innerText = gentleWording ? "A Gentle Compassion Whisper" : "Whisper From Your Little One";
+
+      const bBaby = document.getElementById('tone-btn-baby');
+      const bSoft = document.getElementById('tone-btn-soft');
+      if (bBaby && bSoft) {
+        if (gentleWording) {
+          bSoft.className = "px-2.5 py-1 rounded-lg text-[10px] font-extrabold bg-white text-rose-600 shadow-2xs";
+          bBaby.className = "px-2.5 py-1 rounded-lg text-[10px] font-bold text-stone-600";
+        } else {
+          bBaby.className = "px-2.5 py-1 rounded-lg text-[10px] font-extrabold bg-white text-rose-600 shadow-2xs";
+          bSoft.className = "px-2.5 py-1 rounded-lg text-[10px] font-bold text-stone-600";
+        }
+      }
+    }
+
+    function togglePauseCycle() {
+      isPaused = !isPaused;
+      updatePauseBannerUI();
+      saveState();
+      renderDailyView();
+      showToast(isPaused ? "🕊️ Cycle paused. Rest gently." : "🌸 Cycle resumed.");
+    }
+
+    function updatePauseBannerUI() {
+      const banner = document.getElementById('pause-banner');
+      const btn = document.getElementById('setting-pause-toggle-btn');
+      const lbl = document.getElementById('setting-hold-label');
+
+      if (isPaused) {
+        if (banner) banner.classList.remove('hidden');
+        if (btn) {
+          btn.innerText = '▶️ Resume Cycle';
+          btn.className = 'px-3 py-1.5 rounded-xl text-xs font-extrabold uppercase transition border border-amber-300 bg-amber-100 text-amber-900';
+        }
+        if (lbl) lbl.innerText = 'Cycle currently on gentle rest';
+      } else {
+        if (banner) banner.classList.add('hidden');
+        if (btn) {
+          btn.innerText = '⏸️ Hold Cycle';
+          btn.className = 'px-3 py-1.5 rounded-xl text-xs font-extrabold uppercase transition border border-rose-200 bg-rose-50 text-rose-700';
+        }
+        if (lbl) lbl.innerText = 'Active treatment protocol';
+      }
+    }
+
+    function updateClock() {
+      const now = new Date();
+      const clockEl = document.getElementById('current-clock');
+      if (clockEl) {
+        clockEl.innerText = now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+      }
+    }
+
+    function initApp() {
+      try { navigator.storage && navigator.storage.persist && navigator.storage.persist(); } catch(e) {}
+      loadState();
+      checkPinLock();
+      
+      selectedDay = getTodayDay();
+      applySettings();
+      renderSavedLetters();
+      updateWinsDisplay();
+      updateClock();
+      setInterval(updateClock, 1000);
+      setupBreathingLoop();
+      setupAppWakeListeners();
+      scrollToActiveDayPill();
+    }
+
+    function getSharedSnapshot() {
+      return {
+        cycleStartDateStr,
+        isPaused,
+        isRestMonthActive,
+        completedMeds,
+        savedLetters,
+        routineMeds,
+        clinicPhone,
+        questions,
+        milestones,
+        selectedNeeds,
+        partnerAppreciation,
+        momMood,
+        partnerMood,
+        customCalNotes
+      };
+    }
+
+    function getLocalSnapshot() {
+      return {
+        selectedDay,
+        hopeTone,
+        gentleWording,
+        appPin,
+        hardDay,
+        userSettings,
+        lastSyncAt
+      };
+    }
+
+    function saveState(changedKind, changedKey, changedValue) {
+      // Persist full state locally (shared + per-device)
+      const state = {
+        ...getSharedSnapshot(),
+        ...getLocalSnapshot()
+      };
+      try {
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+      } catch (e) {
+        showToast('⚠️ Storage limit reached. Remove older photos or export backup.');
+      }
+
+      // Queue shared changes for future cloud sync (Phase 3)
+      if (changedKind) {
+        enqueueOutbox('upsert', changedKind, changedKey || '_', changedValue !== undefined ? changedValue : null);
+      }
+    }
+
+    function loadState() {
+      ensureDeviceId();
+      // Restore outbox first
+      try {
+        const obRaw = localStorage.getItem(OUTBOX_KEY);
+        if (obRaw) outbox = JSON.parse(obRaw) || [];
+      } catch (e) { outbox = []; }
+
+      const raw = localStorage.getItem(STORAGE_KEY);
+      if (raw) {
+        try {
+          const parsed = JSON.parse(raw);
+          if (parsed.cycleStartDateStr) {
+            cycleStartDateStr = parsed.cycleStartDateStr;
+            const p = cycleStartDateStr.split('-');
+            stimStartDate = new Date(parseInt(p[0], 10), parseInt(p[1], 10) - 1, parseInt(p[2], 10));
+            calDisplayDate = new Date(stimStartDate);
+          }
+          selectedDay = getTodayDay();
+          isPaused = !!parsed.isPaused;
+          isRestMonthActive = !!parsed.isRestMonthActive;
+          completedMeds = parsed.completedMeds || {};
+          savedLetters = parsed.savedLetters || [];
+          if (parsed.routineMeds && Array.isArray(parsed.routineMeds)) {
+            routineMeds = parsed.routineMeds;
+          }
+          clinicPhone = parsed.clinicPhone || '';
+          questions = parsed.questions || [];
+          hardDay = !!parsed.hardDay;
+          if (parsed.hopeTone) hopeTone = parsed.hopeTone;
+          if (parsed.gentleWording !== undefined) gentleWording = !!parsed.gentleWording;
+          if (parsed.appPin) appPin = parsed.appPin;
+          if (parsed.milestones) milestones = { ...milestones, ...parsed.milestones };
+          if (parsed.selectedNeeds) selectedNeeds = parsed.selectedNeeds;
+          if (parsed.partnerAppreciation) partnerAppreciation = parsed.partnerAppreciation;
+          if (parsed.momMood) momMood = parsed.momMood;
+          if (parsed.partnerMood) partnerMood = parsed.partnerMood;
+          if (parsed.customCalNotes) customCalNotes = parsed.customCalNotes;
+          if (parsed.userSettings) userSettings = { ...userSettings, ...parsed.userSettings };
+          if (parsed.lastSyncAt) lastSyncAt = parsed.lastSyncAt;
+        } catch (e) {
+          console.error(e);
+        }
+      } else {
+        selectedDay = getTodayDay();
+        savedLetters = [
+          {
+            id: 1,
+            author: "Mommy",
+            tag: "💉 Brave Shot",
+            date: "Day 1",
+            text: "Today we took our first courage injection. Daddy held my hand tightly and iced my skin. We love you so much already.",
+            photo: null
+          }
+        ];
+      }
+
+      const toggle = document.getElementById('rest-month-toggle');
+      if (toggle) toggle.checked = isRestMonthActive;
+      const apprecIn = document.getElementById('partner-appreciation-input');
+      if (apprecIn) apprecIn.value = partnerAppreciation || '';
+      
+      applyHardDay();
+      updatePauseBannerUI();
+      updateRoadmapPhase2UI();
+      updateGentleWordingUI();
+      updateHopeCardUI();
+      updateMilestonesUI();
+      renderTeamNeedsUI();
+    }
+
+    function updateDueDateCalculation() {
+      let baseDate = null;
+      if (milestones.retrievalDate) {
+        baseDate = new Date(milestones.retrievalDate + 'T00:00:00');
+        baseDate.setDate(baseDate.getDate() + 266);
+      } else if (milestones.scanDate) {
+        baseDate = new Date(milestones.scanDate + 'T00:00:00');
+        baseDate.setDate(baseDate.getDate() + 272);
+      } else {
+        baseDate = new Date(stimStartDate);
+        baseDate.setDate(baseDate.getDate() + 280);
+      }
+
+      const options = { month: 'long', day: 'numeric', year: 'numeric' };
+      const formattedArrival = baseDate.toLocaleDateString('en-US', options);
+      
+      const txt = document.getElementById('miracle-due-date-text');
+      if (txt) {
+        txt.innerText = `Expected Arrival: ~${formattedArrival} 🌸`;
+      }
+    }
+
+    function changeCalMonth(offset) {
+      calDisplayDate.setDate(1); // Normalizes day cursor to prevent month skip bug
+      calDisplayDate.setMonth(calDisplayDate.getMonth() + offset);
+      renderCalendar();
+    }
+
+    function renderCalendar() {
+      const container = document.getElementById('calendar-days-grid');
+      if (!container) return;
+      container.innerHTML = '';
+
+      const year = calDisplayDate.getFullYear();
+      const month = calDisplayDate.getMonth();
+      
+      const monthNames = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
+      document.getElementById('calendar-month-header').innerText = `${monthNames[month]} ${year}`;
+
+      const firstDayIndex = new Date(year, month, 1).getDay();
+      const daysInMonth = new Date(year, month + 1, 0).getDate();
+
+      const today = new Date();
+      const isCurrentMonth = (today.getFullYear() === year && today.getMonth() === month);
+      const currentDay = today.getDate();
+
+      for (let i = 0; i < firstDayIndex; i++) {
+        const empty = document.createElement('div');
+        empty.className = 'h-9 rounded-xl opacity-20';
+        container.appendChild(empty);
+      }
+
+      for (let day = 1; day <= daysInMonth; day++) {
+        const cell = document.createElement('button');
+        const isCurrentDay = isCurrentMonth && day === currentDay;
+        
+        const cellDateStr = `${year}-${String(month + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
+        
+        const cellDate = new Date(year, month, day);
+        cellDate.setHours(0,0,0,0);
+        const stimEnd = new Date(stimStartDate);
+        stimEnd.setDate(stimEnd.getDate() + (userSettings.totalCycleDays - 1));
+        stimEnd.setHours(0,0,0,0);
+        
+        const isStimDay = (cellDate >= stimStartDate && cellDate <= stimEnd);
+        const isScan = (milestones.scanDate === cellDateStr);
+        const isTrigger = (milestones.triggerDate === cellDateStr);
+        const isRetrieval = (milestones.retrievalDate === cellDateStr);
+        const hasNotes = customCalNotes[cellDateStr] && customCalNotes[cellDateStr].length > 0;
+
+        let bgClass = 'bg-white/80 text-stone-700';
+        if (isStimDay) bgClass = 'bg-rose-100/80 text-rose-950 font-bold';
+        if (isCurrentDay) bgClass = 'ring-2 ring-rose-500 bg-rose-200/90 text-rose-950 font-extrabold shadow-sm';
+
+        cell.className = `h-9 rounded-xl flex flex-col items-center justify-center relative text-xs transition active:scale-95 ${bgClass}`;
+        
+        let marker = '';
+        if (isScan) marker = '<span class="text-[9px] -mt-1">⭐</span>';
+        else if (isTrigger) marker = '<span class="text-[9px] -mt-1">🌟</span>';
+        else if (isRetrieval) marker = '<span class="text-[9px] -mt-1">🌸</span>';
+        else if (hasNotes) marker = '<span class="text-[9px] -mt-1">📝</span>';
+
+        cell.innerHTML = `<span>${day}</span>${marker}`;
+        cell.onclick = () => showCalendarDayDetail(monthNames[month], day, year, cellDateStr, isStimDay, isScan, isTrigger, isRetrieval);
+        container.appendChild(cell);
+      }
+    }
+
+    let activeSelectedCalDateStr = '';
+    function showCalendarDayDetail(monthName, day, year, dateStr, isStim, isScan, isTrigger, isRetrieval) {
+      activeSelectedCalDateStr = dateStr;
+      const title = document.getElementById('cal-selected-day-title');
+      const desc = document.getElementById('cal-selected-day-desc');
+      const medsList = document.getElementById('cal-selected-meds-list');
+      const notesList = document.getElementById('cal-user-notes-list');
+
+      title.innerText = `Care Details: ${monthName} ${day}, ${year}`;
+      
+      let notes = [];
+      if (isScan) notes.push("⭐ Follicle Ultrasound Scan scheduled (as told by clinic).");
+      if (isTrigger) notes.push("🌟 Precise Timing Trigger Injection.");
+      if (isRetrieval) notes.push("🌸 Egg Retrieval (OPU) procedure.");
+      if (isStim) notes.push("💉 Daily stimulation routine & nourishment.");
+      else notes.push("🕊️ Rest, lab observation, or uterine preparation day.");
+
+      desc.innerHTML = notes.join("<br>");
+      
+      notesList.innerHTML = '';
+      const dayNotes = customCalNotes[dateStr] || [];
+      if (dayNotes.length > 0) {
+        dayNotes.forEach((n, idx) => {
+          const item = document.createElement('div');
+          item.className = 'p-2 rounded-xl bg-rose-50/90 border border-rose-200 flex justify-between items-center text-xs font-semibold text-rose-900';
+          item.innerHTML = `<span>📝 ${esc(n)}</span><button onclick="event.stopPropagation(); deleteCalNote('${dateStr}', ${idx})" class="text-stone-400 hover:text-rose-600 font-bold px-1">&times;</button>`;
+          notesList.appendChild(item);
+        });
+      }
+
+      medsList.innerHTML = isStim ? routineMeds.map(m => `
+        <div class="p-2 rounded-xl bg-white/90 border border-stone-100 flex justify-between items-center text-xs">
+          <span class="font-bold text-stone-800">${m.name}</span>
+          <span class="text-stone-500">${m.time}</span>
+        </div>
+      `).join('') : '<p class="text-xs text-stone-400 italic">No daily injections scheduled for this date.</p>';
+    }
+
+    function openAddCalendarNotePrompt() {
+      if (!activeSelectedCalDateStr) {
+        const today = new Date();
+        activeSelectedCalDateStr = `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, '0')}-${String(today.getDate()).padStart(2, '0')}`;
+      }
+      document.getElementById('cal-note-target-date').value = activeSelectedCalDateStr;
+      document.getElementById('cal-note-modal-title').innerText = `Note for ${activeSelectedCalDateStr}`;
+      document.getElementById('cal-note-input').value = '';
+      document.getElementById('cal-note-modal').classList.remove('hidden');
+    }
+    function closeCalNoteModal() {
+      document.getElementById('cal-note-modal').classList.add('hidden');
+    }
+    function saveCalendarNote() {
+      const dateStr = document.getElementById('cal-note-target-date').value;
+      const text = document.getElementById('cal-note-input').value.trim();
+      if (!text) {
+        showToast("Please enter a note.");
+        return;
+      }
+      if (!customCalNotes[dateStr]) customCalNotes[dateStr] = [];
+      customCalNotes[dateStr].push(text);
+      saveState();
+      renderCalendar();
+      closeCalNoteModal();
+      showToast("📝 Note pinned to calendar date!");
+    }
+    function deleteCalNote(dateStr, idx) {
+      if (customCalNotes[dateStr]) {
+        customCalNotes[dateStr].splice(idx, 1);
+        if (customCalNotes[dateStr].length === 0) delete customCalNotes[dateStr];
+        saveState();
+        renderCalendar();
+        showToast("Note removed.");
+      }
+    }
+
+    function openAddMedModal() {
+      document.getElementById('edit-med-id').value = '';
+      document.getElementById('med-edit-title').innerText = "Add Miracle Step";
+      document.getElementById('input-med-name').value = '';
+      document.getElementById('input-med-time').value = '08:00 AM';
+      document.getElementById('input-med-dose').value = '1 Tab';
+      document.getElementById('input-med-note').value = 'Nourishing care';
+      document.getElementById('input-med-isinj').checked = false;
+      document.getElementById('delete-med-btn').classList.add('hidden');
+      document.getElementById('med-edit-modal').classList.remove('hidden');
+    }
+
+    function openEditMedModal(id, e) {
+      if (e) e.stopPropagation();
+      const med = routineMeds.find(m => m.id === id);
+      if (!med) return;
+      document.getElementById('edit-med-id').value = med.id;
+      document.getElementById('med-edit-title').innerText = "Edit Miracle Step";
+      document.getElementById('input-med-name').value = med.name;
+      document.getElementById('input-med-time').value = med.time;
+      document.getElementById('input-med-dose').value = med.dose;
+      document.getElementById('input-med-note').value = med.note || '';
+      document.getElementById('input-med-isinj').checked = !!med.isInjection;
+      document.getElementById('delete-med-btn').classList.remove('hidden');
+      document.getElementById('med-edit-modal').classList.remove('hidden');
+    }
+
+    function closeMedEditModal() {
+      document.getElementById('med-edit-modal').classList.add('hidden');
+    }
+
+    function saveMedEdit() {
+      const id = document.getElementById('edit-med-id').value;
+      const name = document.getElementById('input-med-name').value.trim();
+      const time = document.getElementById('input-med-time').value.trim();
+      const dose = document.getElementById('input-med-dose').value.trim();
+      const note = document.getElementById('input-med-note').value.trim();
+      const isInj = document.getElementById('input-med-isinj').checked;
+
+      if (!name || !time) {
+        showToast("Please enter step name and time.");
+        return;
+      }
+
+      if (id) {
+        const med = routineMeds.find(m => m.id === id);
+        if (med) {
+          med.name = name;
+          med.time = time;
+          med.dose = dose;
+          med.note = note;
+          med.isInjection = isInj;
+        }
+      } else {
+        const newMed = {
+          id: 'med_' + Date.now(),
+          name, time, dose, note,
+          isInjection: isInj
+        };
+        routineMeds.push(newMed);
+      }
+
+      sortRoutineMeds();
+      saveState();
+      renderDailyView();
+      closeMedEditModal();
+      showToast("🌸 Miracle steps updated and sorted!");
+    }
+
+    function deleteMedItem() {
+      const id = document.getElementById('edit-med-id').value;
+      if (id && confirm("Remove this step from your daily routine?")) {
+        routineMeds = routineMeds.filter(m => m.id !== id);
+        sortRoutineMeds();
+        saveState();
+        renderDailyView();
+        closeMedEditModal();
+        showToast("Step removed.");
+      }
+    }
+
+    function updateMilestonesUI() {
+      const sDisp = document.getElementById('milestone-scan-disp');
+      const tDisp = document.getElementById('milestone-trigger-disp');
+      const rDisp = document.getElementById('milestone-retrieval-disp');
+
+      const fmt = d => d ? new Date(d + 'T00:00:00').toLocaleDateString('en-US', { month: 'short', day: 'numeric' }) : 'Pending';
+
+      if (sDisp) sDisp.innerText = fmt(milestones.scanDate);
+      if (tDisp) tDisp.innerText = fmt(milestones.triggerDate);
+      if (rDisp) rDisp.innerText = fmt(milestones.retrievalDate);
+
+      const bannerDate = document.getElementById('scan-date-label');
+      if (bannerDate && milestones.scanDate) {
+        bannerDate.innerText = `Scan • ${fmt(milestones.scanDate)}`;
+      }
+
+      const badge = document.getElementById('scan-countdown-badge');
+      if (badge && milestones.scanDate) {
+        const today = new Date();
+        today.setHours(0,0,0,0);
+        const scan = new Date(milestones.scanDate + 'T00:00:00');
+        scan.setHours(0,0,0,0);
+        const diffDays = Math.round((scan - today) / 864e5);
+
+        if (diffDays > 0) {
+          badge.innerText = `In ${diffDays} Day${diffDays > 1 ? 's' : ''}`;
+          badge.className = 'text-[11px] font-bold bg-white text-rose-600 px-2 py-1 rounded-xl border border-rose-200';
+        } else if (diffDays === 0) {
+          badge.innerText = 'TODAY! 🌟';
+          badge.className = 'text-[11px] font-bold bg-rose-500 text-white px-2 py-1 rounded-xl shadow-sm animate-pulse';
+        } else {
+          badge.innerText = 'Completed ✓';
+          badge.className = 'text-[11px] font-bold bg-emerald-100 text-emerald-800 px-2 py-1 rounded-xl';
+        }
+      }
+
+      updateDueDateCalculation();
+    }
+
+    function openMilestonesModal() {
+      document.getElementById('input-milestone-scan').value = milestones.scanDate || '';
+      document.getElementById('input-milestone-trigger').value = milestones.triggerDate || '';
+      document.getElementById('input-milestone-retrieval').value = milestones.retrievalDate || '';
+      document.getElementById('milestones-modal').classList.remove('hidden');
+    }
+    function closeMilestonesModal() {
+      document.getElementById('milestones-modal').classList.add('hidden');
+    }
+    function saveMilestones() {
+      milestones.scanDate = document.getElementById('input-milestone-scan').value;
+      milestones.triggerDate = document.getElementById('input-milestone-trigger').value;
+      milestones.retrievalDate = document.getElementById('input-milestone-retrieval').value;
+      saveState('milestone', 'all', milestones);
+      updateMilestonesUI();
+      renderCalendar();
+      closeMilestonesModal();
+      showToast("Clinic milestones synchronized.");
+    }
+
+    function compressImageToBase64(file, maxBytes = 150000, maxDim = 900) {
+      return new Promise((resolve, reject) => {
+        const reader = new FileReader();
+        reader.onload = function(e) {
+          const img = new Image();
+          img.onload = () => {
+            let w = img.width, h = img.height;
+            if (w > maxDim || h > maxDim) {
+              if (w > h) { h = Math.round((h * maxDim) / w); w = maxDim; }
+              else { w = Math.round((w * maxDim) / h); h = maxDim; }
+            }
+            const canvas = document.createElement('canvas');
+            canvas.width = w;
+            canvas.height = h;
+            const ctx = canvas.getContext('2d');
+            ctx.drawImage(img, 0, 0, w, h);
+
+            let quality = 0.72;
+            let dataUrl = canvas.toDataURL('image/jpeg', quality);
+            // Shrink quality until under maxBytes (or quality floor)
+            while (dataUrl.length > maxBytes && quality > 0.35) {
+              quality -= 0.07;
+              dataUrl = canvas.toDataURL('image/jpeg', quality);
+            }
+            // If still too large, shrink dimensions once more
+            if (dataUrl.length > maxBytes) {
+              const scale = 0.7;
+              canvas.width = Math.round(w * scale);
+              canvas.height = Math.round(h * scale);
+              ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+              dataUrl = canvas.toDataURL('image/jpeg', 0.55);
+            }
+            resolve(dataUrl);
+          };
+          img.onerror = reject;
+          img.src = e.target.result;
+        };
+        reader.onerror = reject;
+        reader.readAsDataURL(file);
+      });
+    }
+
+    async function handlePhotoUpload(input) {
+      if (input.files && input.files[0]) {
+        const file = input.files[0];
+        document.getElementById('photo-preview-name').innerText = 'Compressing…';
+        try {
+          attachedPhotoBase64 = await compressImageToBase64(file);
+          const kb = Math.round((attachedPhotoBase64.length * 0.75) / 1024);
+          document.getElementById('photo-preview-name').innerText = file.name.substring(0, 14) + `… (${kb} KB)`;
+        } catch (err) {
+          attachedPhotoBase64 = null;
+          document.getElementById('photo-preview-name').innerText = 'Could not load photo';
+          showToast('Photo could not be processed.');
+        }
+      }
+    }
+
+    function setHopeTone(tone) {
+      hopeTone = tone;
+      updateHopeCardUI();
+      drawHopeCard();
+      saveState();
+    }
+
+    function updateHopeCardUI() {
+      const hBtn = document.getElementById('tone-hopeful');
+      const sBtn = document.getElementById('tone-steady');
+      const jBtn = document.getElementById('tone-just-today');
+      
+      const resetClass = 'px-2 py-0.5 rounded-lg text-[10px] font-bold text-stone-700';
+      const activeClass = 'px-2 py-0.5 rounded-lg text-[10px] font-extrabold bg-white text-rose-600 shadow-2xs';
+
+      if (hBtn) hBtn.className = (hopeTone === 'Hopeful') ? activeClass : resetClass;
+      if (sBtn) sBtn.className = (hopeTone === 'Steady') ? activeClass : resetClass;
+      if (jBtn) jBtn.className = (hopeTone === 'Just today') ? activeClass : resetClass;
+    }
+
+    function drawHopeCard() {
+      const activeTone = hardDay ? 'Just today' : hopeTone;
+      const deck = HOPE_CARDS_DECK[activeTone] || HOPE_CARDS_DECK['Steady'];
+      
+      // Smart randomizer: Guaranteed new card on every tap!
+      const q = document.getElementById('hope-card-quote');
+      const currentText = q ? q.innerText.replace(/^"|"$/g, '').trim() : '';
+      const pool = deck.filter(c => c !== currentText);
+      const card = pool.length > 0 ? pool[Math.floor(Math.random() * pool.length)] : deck[0];
+      
+      const sub = document.getElementById('hope-card-sub');
+      if (q) {
+        q.style.opacity = '0.3';
+        setTimeout(() => {
+          q.innerText = `"${card}"`;
+          q.style.opacity = '1';
+        }, 120);
+      }
+      if (sub) sub.innerText = activeTone === 'Just today' ? 'No pressure. Just presence.' : 'A gentle anchor for your heart.';
+      playLoveChime();
+    }
+
+    let hopeVisTimer = null;
+    function startHopeVisualization() {
+      document.getElementById('hope-vis-modal').classList.remove('hidden');
+      startHopeMusic();
+      
+      let secondsLeft = 75;
+      const countEl = document.getElementById('hope-vis-countdown');
+      const stepEl = document.getElementById('hope-vis-step-text');
+      const progEl = document.getElementById('hope-vis-progress');
+
+      if (hopeVisTimer) clearInterval(hopeVisTimer);
+
+      const prompts = [
+        [75, "Close your eyes or soften your gaze. Inhale slow... drop your shoulders."],
+        [60, "Place one hand on your heart and one on your lower belly. Feel your warmth."],
+        [45, "Imagine a quiet, golden light cradling your ovaries and womb."],
+        [30, "Your body has worked with devotion. Breathe in quiet gratitude."],
+        [15, "Feel your partner and care team holding this journey with you."],
+        [0, "You are safe. Carry this quiet comfort into your day."]
+      ];
+
+      function update() {
+        countEl.innerText = `${secondsLeft}s`;
+        const pct = Math.round(((75 - secondsLeft) / 75) * 100);
+        progEl.style.width = `${pct}%`;
+
+        for (let p of prompts) {
+          if (secondsLeft >= p[0] - 15 && secondsLeft <= p[0]) {
+            stepEl.innerText = p[1];
+            break;
+          }
+        }
+
+        if (secondsLeft <= 0) {
+          clearInterval(hopeVisTimer);
+          stopHopeMusic();
+          playLoveChime();
+          stepEl.innerText = "Complete 🌸 Rest in this joyful calm.";
+          setTimeout(closeHopeVisualization, 2500);
+        }
+        secondsLeft--;
+      }
+      update();
+      hopeVisTimer = setInterval(update, 1000);
+    }
+
+    function closeHopeVisualization() {
+      if (hopeVisTimer) clearInterval(hopeVisTimer);
+      stopHopeMusic();
+      document.getElementById('hope-vis-modal').classList.add('hidden');
+    }
+
+    function toggleTeamNeed(btn, needText) {
+      const idx = selectedNeeds.indexOf(needText);
+      if (idx > -1) {
+        selectedNeeds.splice(idx, 1);
+      } else {
+        selectedNeeds.push(needText);
+      }
+      saveState();
+      renderTeamNeedsUI();
+    }
+
+    function renderTeamNeedsUI() {
+      document.querySelectorAll('.team-need-btn').forEach(btn => {
+        const text = btn.innerText.trim();
+        if (selectedNeeds.includes(text)) {
+          btn.className = 'team-need-btn px-2.5 py-1.5 rounded-xl bg-rose-500 text-white border border-rose-500 text-xs font-bold shadow-2xs';
+        } else {
+          btn.className = 'team-need-btn px-2.5 py-1.5 rounded-xl bg-white border border-stone-200 text-xs font-bold text-stone-700';
+        }
+      });
+    }
+
+    function sendTeamCheckInToPartner() {
+      const apprec = document.getElementById('partner-appreciation-input').value.trim();
+      const needs = selectedNeeds.length ? selectedNeeds.join(", ") : "Holding hands in silence 🤍";
+      
+      const shareText = `🤍 *DSR Hope Team Check-In*:\n• *What I need today*: ${needs}\n` + 
+                        (apprec ? `• *What I appreciate about you*: "${apprec}"\n` : '') + 
+                        `• Let's take tonight one gentle step at a time.`;
+
+      const waUrl = `https://api.whatsapp.com/send?text=${encodeURIComponent(shareText)}`;
+      
+      const win = window.open(waUrl, '_blank');
+      if (!win) {
+        window.location.href = waUrl;
+      }
+      showToast("💬 Opening WhatsApp...");
+    }
+
+    function openHowAreWeModal() {
+      document.getElementById('how-are-we-modal').classList.remove('hidden');
+    }
+    function closeHowAreWeModal() {
+      document.getElementById('how-are-we-modal').classList.add('hidden');
+    }
+    function selectMomMood(btn, mood) {
+      momMood = mood;
+      document.querySelectorAll('#mom-mood-btns button').forEach(b => b.className = 'p-2 rounded-xl bg-white border border-stone-200 font-bold');
+      btn.className = 'p-2 rounded-xl bg-rose-500 text-white font-extrabold shadow-2xs';
+      evalHarmony();
+    }
+    function selectPartnerMood(btn, mood) {
+      partnerMood = mood;
+      document.querySelectorAll('#partner-mood-btns button').forEach(b => b.className = 'p-2 rounded-xl bg-white border border-stone-200 font-bold');
+      btn.className = 'p-2 rounded-xl bg-rose-500 text-white font-extrabold shadow-2xs';
+      evalHarmony();
+    }
+    function evalHarmony() {
+      if (momMood && partnerMood) {
+        const card = document.getElementById('harmony-result-card');
+        card.classList.remove('hidden');
+        card.innerHTML = `<strong>Today's Harmony:</strong> Mommy is ${momMood}, Partner is ${partnerMood}.<br>Slow down your evening together. Quiet presence is medicine.`;
+      }
+    }
+    function saveHowAreWeCheckin() {
+      if (!momMood || !partnerMood) {
+        showToast("Please select feelings for both of you.");
+        return;
+      }
+      saveState();
+      playLoveChime();
+      closeHowAreWeModal();
+      showToast("🤍 Harmony noted. Take care of each other tonight.");
+    }
+
+    function updateWinsDisplay() {
+      const totalDosesDone = Object.values(completedMeds).filter(Boolean).length;
+      
+      let fullDaysDone = 0;
+      for (let d = 1; d <= userSettings.totalCycleDays; d++) {
+        const allDone = routineMeds.every(m => completedMeds[`day-${d}-${m.id}`]);
+        if (allDone) fullDaysDone++;
+      }
+
+      const totalNotes = savedLetters.length;
+
+      const dEl = document.getElementById('win-doses-count');
+      const fEl = document.getElementById('win-days-count');
+      const nEl = document.getElementById('win-notes-count');
+
+      if (dEl) dEl.innerText = totalDosesDone;
+      if (fEl) fEl.innerText = fullDaysDone;
+      if (nEl) nEl.innerText = totalNotes;
+    }
+
+    function getCalendarDateForDay(dayNumber) {
+      const target = new Date(stimStartDate);
+      target.setDate(target.getDate() + (dayNumber - 1));
+      return target.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+    }
+
+    function renderDayPills() {
+      const container = document.getElementById('day-pills-row');
+      if (!container) return;
+      container.innerHTML = '';
+      
+      const todayNum = getTodayDay();
+      
+      for (let d = 1; d <= userSettings.totalCycleDays; d++) {
+        const pill = document.createElement('button');
+        const isActive = d === selectedDay;
+        const isToday = d === todayNum;
+        const calDate = getCalendarDateForDay(d);
+        
+        pill.id = `day-pill-${d}`;
+        pill.className = `flex flex-col items-center justify-center py-2 px-3 rounded-2xl shrink-0 transition ${
+          isActive 
+            ? 'bg-gradient-to-tr from-rose-500 to-pink-500 text-white shadow-md scale-105 font-extrabold' 
+            : 'bg-white/80 text-stone-700 hover:bg-white font-bold'
+        }`;
+        
+        pill.onclick = () => selectDay(d);
+        pill.innerHTML = `
+          <span class="text-[10px] uppercase tracking-wider opacity-90">${isToday ? 'Today' : 'Day ' + d}</span>
+          <span class="text-xs font-black mt-0.5">${calDate}</span>
+        `;
+        container.appendChild(pill);
+      }
+    }
+
+    function scrollToActiveDayPill() {
+      setTimeout(() => {
+        const activePill = document.getElementById(`day-pill-${selectedDay}`);
+        if (activePill) {
+          activePill.scrollIntoView({ behavior: 'smooth', inline: 'center', block: 'nearest' });
+        }
+      }, 80);
+    }
+
+    function selectDay(dayNumber) {
+      selectedDay = dayNumber;
+      renderDayPills();
+      renderDailyView();
+      saveState();
+      scrollToActiveDayPill();
+    }
+
+    function renderDailyView() {
+      const calDate = getCalendarDateForDay(selectedDay);
+      const isToday = selectedDay === getTodayDay();
+      document.getElementById('current-day-label').innerText = `${isToday ? "Today • " : ""}Day ${selectedDay} of ${userSettings.totalCycleDays} (${calDate})`;
+      
+      const jumpBtn = document.getElementById('jump-to-today-btn');
+      if (jumpBtn) {
+        if (!isToday) jumpBtn.classList.remove('hidden');
+        else jumpBtn.classList.add('hidden');
+      }
+
+      let letter = "";
+      if (hardDay) {
+        letter = "You do not have to feel anything special today. One small step at a time is enough.";
+      } else if (gentleWording) {
+        letter = GENTLE_AFFIRMATIONS[selectedDay] || "Your body is doing sacred work. Soften where you can.";
+      } else {
+        letter = BABY_LETTERS[selectedDay] || "Mommy and Daddy, thank you for every single step of courage.";
+      }
+      document.getElementById('baby-letter-text').innerText = `"${letter}"`;
+
+      sortRoutineMeds();
+      const medContainer = document.getElementById('med-list-container');
+      medContainer.innerHTML = '';
+
+      let checkedCount = 0;
+      routineMeds.forEach(med => {
+        const key = `day-${selectedDay}-${med.id}`;
+        const isDone = !!completedMeds[key];
+        if (isDone) checkedCount++;
+
+        const item = document.createElement('div');
+        item.className = `glass-card rounded-2xl p-3 flex items-center justify-between transition cursor-pointer active:scale-[0.99] border ${
+          isDone ? 'border-rose-400 bg-white' : 'border-white'
+        }`;
+        item.onclick = () => toggleMed(key);
+
+        item.innerHTML = `
+          <div class="flex items-center gap-3">
+            <div class="w-7 h-7 rounded-xl border-2 flex items-center justify-center transition ${
+              isDone ? 'check-btn-active border-transparent' : 'border-stone-300 bg-white/90'
+            }">
+              <span class="text-xs font-black">${isDone ? '✓' : ''}</span>
+            </div>
+            <div>
+              <div class="flex items-center gap-2">
+                <p class="text-xs font-bold text-stone-900 ${isDone ? 'line-through opacity-60' : ''}">${esc(med.name)}</p>
+                ${med.isInjection ? '<span class="text-[10px] bg-rose-100 text-rose-700 font-extrabold px-1.5 py-0.5 rounded-full">Injection 💉</span>' : ''}
+              </div>
+              <p class="text-[11px] font-medium text-stone-600">${med.time} • ${med.dose} • ${esc(med.note || '')}</p>
+            </div>
+          </div>
+          <div class="flex items-center gap-1.5">
+            <span class="text-xs font-bold px-2 py-0.5 rounded-full ${
+              isDone ? 'bg-emerald-100 text-emerald-800' : 'bg-stone-100 text-stone-500'
+            }">${isDone ? 'Done' : 'Pending'}</span>
+            <button onclick="event.stopPropagation(); openEditMedModal('${med.id}', event)" class="p-1.5 text-stone-400 hover:text-rose-600 rounded-lg text-xs" title="Edit Step">✏️</button>
+          </div>
+        `;
+        medContainer.appendChild(item);
+      });
+
+      renderRx();
+      updatePodUI(checkedCount, routineMeds.length);
+      updateWinsDisplay();
+    }
+
+    function toggleMed(key) {
+      completedMeds[key] = !completedMeds[key];
+      if (completedMeds[key]) {
+        playLoveChime();
+        if (userSettings.haptics && navigator.vibrate) navigator.vibrate(40);
+      }
+      saveState('med_done', key, !!completedMeds[key]);
+      renderDailyView();
+
+      const allDone = routineMeds.every(m => completedMeds[`day-${selectedDay}-${m.id}`]);
+      if (allDone && !hardDay) {
+        confetti({ particleCount: 50, spread: 60, origin: { y: 0.65 } });
+      }
+    }
+
+    function updatePodUI(completed, total) {
+      const percent = total > 0 ? Math.round((completed / total) * 100) : 0;
+      document.getElementById('sanctuary-progress-bar').style.width = `${percent}%`;
+      document.getElementById('pod-step-counter').innerText = `${completed} of ${total} Cares Done`;
+
+      const emoji = document.getElementById('pod-emoji');
+      const title = document.getElementById('pod-status-title');
+      const sub = document.getElementById('pod-status-sub');
+      const quote = document.getElementById('reassurance-quote');
+
+      if (isPaused) {
+        emoji.innerText = '🕊️';
+        title.innerText = 'Resting Sanctuary';
+        sub.innerText = 'Gathering Energy';
+        quote.innerText = '"Resting is not stopping. Your body is taking deep nourishment."';
+        return;
+      }
+
+      if (percent === 100) {
+        emoji.innerText = selectedDay >= 10 ? '🌸' : '🪷';
+        title.innerText = 'In Radiant Bloom!';
+        sub.innerText = 'Surrounded in Love';
+        quote.innerText = '"You gave your heart everything today. Sleep in peace, Mama & Papa."';
+      } else if (percent >= 50) {
+        emoji.innerText = '🌿';
+        title.innerText = 'Sprouting Strong';
+        sub.innerText = 'Reaching Towards You';
+        quote.innerText = '"Every injection is pure bravery. Look at you go!"';
+      } else {
+        emoji.innerText = '🌱';
+        title.innerText = 'Little Seed';
+        sub.innerText = 'Safe & Warm';
+        quote.innerText = '"Every single dose is a gentle step closer to our miracle."';
+      }
+    }
+
+    function setAuthor(auth) {
+      currentAuthor = auth;
+      document.getElementById('author-mom').className = `px-2.5 py-1 rounded-lg text-xs font-bold ${auth === 'Mommy' ? 'bg-white text-rose-600 shadow-2xs font-extrabold' : 'text-stone-600'}`;
+      document.getElementById('author-dad').className = `px-2.5 py-1 rounded-lg text-xs font-bold ${auth === 'Daddy' ? 'bg-white text-rose-600 shadow-2xs font-extrabold' : 'text-stone-600'}`;
+      document.getElementById('author-both').className = `px-2.5 py-1 rounded-lg text-xs font-bold ${auth === 'Both' ? 'bg-white text-rose-600 shadow-2xs font-extrabold' : 'text-stone-600'}`;
+    }
+
+    function setMemoryTag(btn, tag) {
+      currentTag = tag;
+      document.querySelectorAll('.tag-pill').forEach(b => {
+        b.className = 'tag-pill shrink-0 px-2 py-1 rounded-lg text-xs font-bold bg-white text-stone-600 border border-stone-200';
+      });
+      btn.className = 'tag-pill shrink-0 px-2 py-1 rounded-lg text-xs font-extrabold bg-rose-500 text-white border border-rose-500 shadow-2xs';
+    }
+
+    function promptHeartfeltIdea() {
+      const randomPrompt = PROMPT_IDEAS[Math.floor(Math.random() * PROMPT_IDEAS.length)];
+      const input = document.getElementById('letter-input');
+      input.value = `"${randomPrompt}" \n\n`;
+      input.focus();
+      showToast("💡 Heartfelt prompt loaded!");
+    }
+
+    function tapJarCelebration() {
+      playLoveChime();
+      if (!hardDay) {
+        confetti({ particleCount: 35, spread: 50, origin: { y: 0.5 }, colors: ['#FF758C', '#FFAAA6', '#FFFFFF'] });
+      }
+      showToast(`🫙 ${savedLetters.length} love notes kept safely.`);
+    }
+
+    function saveLetterToBaby() {
+      const input = document.getElementById('letter-input');
+      const text = input.value.trim();
+      if (!text) {
+        showToast("Please write a few words from your heart.");
+        return;
+      }
+
+      const newEntry = {
+        id: Date.now(),
+        author: currentAuthor,
+        tag: currentTag,
+        date: `Day ${getTodayDay()} • ${new Date().toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}`,
+        text: text,
+        photo: attachedPhotoBase64
+      };
+
+      savedLetters.unshift(newEntry);
+      
+      input.value = '';
+      attachedPhotoBase64 = null;
+      document.getElementById('photo-file-input').value = '';
+      document.getElementById('photo-preview-name').innerText = 'No photo attached';
+
+      playLoveChime();
+      if (!hardDay) confetti({ particleCount: 40, spread: 60, origin: { y: 0.75 } });
+      showToast("💌 Note kept safely in the jar!");
+      
+      // Photos stay in the letter for Phase 1; later we upload to Storage and keep only the path
+      const letterForSync = { ...newEntry, photo: newEntry.photo ? '[photo-present]' : null };
+      saveState('letter', String(newEntry.id), letterForSync);
+      renderSavedLetters();
+      updateWinsDisplay();
+    }
+
+    function filterLetters(type) {
+      currentFilter = type;
+      document.getElementById('filter-all').className = `px-2 py-0.5 rounded-md font-bold ${type === 'all' ? 'bg-rose-500 text-white' : 'bg-white text-stone-600'}`;
+      document.getElementById('filter-mom').className = `px-2 py-0.5 rounded-md font-bold ${type === 'Mommy' ? 'bg-rose-500 text-white' : 'bg-white text-stone-600'}`;
+      document.getElementById('filter-dad').className = `px-2 py-0.5 rounded-md font-bold ${type === 'Daddy' ? 'bg-rose-500 text-white' : 'bg-white text-stone-600'}`;
+      renderSavedLetters();
+    }
+
+    function renderSavedLetters() {
+      const container = document.getElementById('saved-letters-container');
+      const jarCounter = document.getElementById('jar-counter-badge');
+      if (jarCounter) jarCounter.innerText = `${savedLetters.length} Letter${savedLetters.length === 1 ? '' : 's'}`;
+
+      container.innerHTML = '';
+
+      let filtered = savedLetters;
+      if (currentFilter !== 'all') {
+        filtered = savedLetters.filter(l => l.author === currentFilter);
+      }
+
+      if (filtered.length === 0) {
+        container.innerHTML = `<p class="text-xs text-stone-500 italic text-center py-6">No letters found in this view. Write a love note above.</p>`;
+        return;
+      }
+
+      filtered.forEach(item => {
+        const card = document.createElement('div');
+        card.className = 'glass-card rounded-2xl p-3.5 border border-white space-y-2';
+        
+        card.innerHTML = `
+          <div class="flex items-center justify-between text-xs font-bold">
+            <div class="flex items-center gap-1.5">
+              <span class="bg-rose-50 text-rose-700 px-2 py-0.5 rounded-full border border-rose-100">${item.author}</span>
+              <span class="text-stone-400">•</span>
+              <span class="text-stone-600">${item.tag || '💌 Love Note'}</span>
+            </div>
+            <span class="text-rose-600 font-extrabold">${item.date}</span>
+          </div>
+
+          <p class="text-xs font-serif-title italic text-stone-900 leading-relaxed font-medium">"${esc(item.text)}"</p>
+
+          ${item.photo ? `<div class="mt-2 rounded-xl overflow-hidden max-h-40 border border-stone-100 shadow-2xs"><img src="${item.photo}" class="w-full h-full object-cover"></div>` : ''}
+
+          <div class="flex justify-end pt-1">
+            <button onclick="event.stopPropagation(); deleteLetter(${item.id})" class="text-[11px] font-bold text-stone-400 hover:text-rose-600 transition">Remove Entry</button>
+          </div>
+        `;
+        container.appendChild(card);
+      });
+    }
+
+    function deleteLetter(id) {
+      if (confirm("Remove this memory entry from the jar?")) {
+        savedLetters = savedLetters.filter(l => l.id !== id);
+        saveState();
+        renderSavedLetters();
+        updateWinsDisplay();
+        showToast("Entry removed.");
+      }
+    }
+
+    let guideT = null, guideId = 0;
+    function stopGuide() { guideId++; clearTimeout(guideT); }
+    const cBtn = (l, f, c) => `<button onclick="${f}" class="w-full text-left p-3 rounded-2xl ${c || 'bg-white/90 border border-white'} text-xs font-bold text-stone-900 active:scale-[0.99] shadow-2xs">${l}</button>`;
+    const cBack = () => `<button onclick="calmView('home')" class="mt-2 w-full py-2 text-xs font-bold text-rose-600">← Back to Calm Sanctuary</button>`;
+    const cCard = t => `<div class="rounded-2xl bg-white/90 border border-white p-3 text-xs text-stone-700 leading-relaxed space-y-1.5">${t}</div>`;
+    const rounds = (a, n) => Array(n).fill(a).flat();
+
+    function runGuide(title, steps) {
+      stopGuide(); const id = guideId; let i = 0;
+      const body = document.getElementById('calm-body');
+      (function step() {
+        if (id !== guideId) return;
+        if (i >= steps.length) {
+          body.innerHTML = '<p class="text-center py-8 text-sm font-bold text-stone-900">Well done 🌸<br><span class="font-normal text-xs text-stone-600">Notice how peaceful your body feels now.</span></p>' + cBack();
+          return;
+        }
+        const [t, sec, toneType] = steps[i]; i++;
+        if (toneType) playBreathTone(toneType);
+        if (t.includes('Inhale')) speakSoftly('Inhale gently');
+        else if (t.includes('Exhale')) speakSoftly('Exhale peace and relax');
+        
+        body.innerHTML = `<p class="text-xs uppercase tracking-wider text-stone-500 font-bold text-center">${title} · ${i}/${steps.length}</p><p class="text-base font-serif-title text-stone-900 text-center py-8 leading-relaxed font-semibold">${t}</p>` +
+          (sec ? `<p class="text-center text-xs text-stone-500 font-bold"><span id="gsec">${sec}</span>s</p>` : cBtn('Next →', 'gNext()', 'bg-white border border-rose-200 text-center')) +
+          `<button onclick="calmView('home')" class="mt-3 w-full py-2 text-xs font-bold text-stone-500">Stop</button>`;
+        if (sec) {
+          let left = sec;
+          const tick = () => {
+            if (id !== guideId) return;
+            left--;
+            const e = document.getElementById('gsec');
+            if (e) e.textContent = left;
+            if (left > 0) guideT = setTimeout(tick, 1000);
+            else step();
+          };
+          guideT = setTimeout(tick, 1000);
+        } else {
+          window.gNext = () => step();
+        }
+      })();
+    }
+
+    const GROUND = [['Name 5 things you can see', 0], ['Name 4 things you can touch', 0], ['Name 3 things you hear', 0], ['Name 2 things you smell', 0], ['Name 1 thing you taste, then take one breath', 0]];
+    const PAINBREATH = rounds([['Inhale gently through nose', 4, 'inhale'], ['Exhale slowly, drop your shoulders', 6, 'exhale']], 10);
+    const ANXIETYBREATH = rounds([['Inhale calm into belly (4s)', 4, 'inhale'], ['Hold softly, you are safe (4s)', 4, ''], ['Exhale tension completely (6s)', 6, 'exhale']], 6);
+    const SCAN = [['Unclench your jaw', 10], ['Drop your shoulders', 10], ['Open your hands, soften fingers', 10], ['Let your belly be soft. No tensing', 12], ['Relax your hips and thighs', 12], ['Let your legs feel heavy', 12], ['Breathe slowly. You are safe', 15]];
+    const COOL = rounds([['Inhale cool air through nose', 4, 'inhale'], ['Hold softly', 2, ''], ['Exhale heat and anger out mouth', 6, 'exhale']], 5);
+    const PAUSE = [['STOP. Put down what you are holding.', 0], ['Take one slow breath out.', 0], ['Observe: what am I feeling in my body?', 0], ['What is under this: tired, scared, hurting?', 0], ['Proceed: what is one small kind step now?', 0]];
+
+    const CALM = {
+      home: () => cBtn('🌬️ Anxiety & Overwhelm Meditation (with Sound)', "runGuide('Anxiety Calm',ANXIETYBREATH)", 'bg-rose-500 text-white border border-rose-500') +
+        cBtn('🔥 Anger & Frustration Cool-Down', "calmView('anger')") +
+        cBtn('🌡️ Pain & Physical Discomfort Relief', "calmView('pain')") +
+        cBtn('🌿 Grounding 5-4-3-2-1', "runGuide('Grounding',GROUND)") +
+        cBtn('🌬️ 4-7-8 Deep Center Breathing', 'closeCalm();openBreathingModal()') +
+        cBtn('❓ Questions for the Doctor' + (questions.filter(q => !q.done).length ? ` (${questions.filter(q => !q.done).length})` : ''), "calmView('questions')") +
+        cBtn('🌙 Three Good Things Tonight', "calmView('good')") +
+        cBtn('🤝 Emotional Helplines & Support', "calmView('support')") +
+        cBtn(hardDay ? '🕊️ Hard Day mode: ON (tap to turn off)' : '🕊️ Hard Day mode: quiet, no confetti', 'toggleHardDay()', hardDay ? 'bg-amber-100 border border-amber-300' : 'bg-white/90 border border-white'),
+      pain: () => '<p class="text-xs font-bold text-stone-800">How strong is discomfort? (0 = none, 10 = worst)</p><div class="flex flex-wrap gap-1.5">' +
+        [...Array(11).keys()].map(n => `<button onclick="painLevel(${n})" class="w-9 h-9 rounded-xl bg-white border border-rose-100 text-xs font-bold text-stone-800 shadow-2xs">${n}</button>`).join('') + '</div><div id="pain-res"></div>' +
+        cBtn('🌬️ Slow-exhale breathing (with Sound)', "runGuide('Slow exhale',PAINBREATH)") + cBtn('🫧 Soften body scan (90 sec)', "runGuide('Soften',SCAN)") +
+        cCard('Soothing words: <i>"This will pass. I am safe. My body is doing hard work. I can soften."</i>') + cBack(),
+      anger: () => cCard('Anger is normal. IVF hormones and stress make feelings intense. You are not a bad person for feeling this.') +
+        cBtn('🌬️ Cool-down breath (1 min with Sound)', "runGuide('Cool down',COOL)") + cBtn('✋ Stop · Breathe · Observe · Proceed', "runGuide('Pause',PAUSE)") + cBack(),
+      questions: () => '<div class="flex gap-2"><input id="q-in" placeholder="A question for the doctor" class="flex-1 p-2 rounded-xl bg-white border border-stone-200 text-xs text-stone-900"><button onclick="qAdd()" class="px-3 rounded-xl bg-rose-500 text-white text-xs font-bold">Add</button></div>' +
+        (questions.length ? questions.map(q => `<div class="flex items-center gap-2 p-2 rounded-xl bg-white/90 text-xs"><button onclick="qToggle(${q.id})" class="w-6 h-6 rounded-lg border-2 ${q.done ? 'bg-rose-500 border-rose-500 text-white' : 'border-stone-300'} font-bold">${q.done ? '✓' : ''}</button><span class="flex-1 font-medium ${q.done ? 'line-through opacity-60' : 'text-stone-800'}">${esc(q.text)}</span><button onclick="qDel(${q.id})" class="text-stone-400 px-1 text-sm font-bold">&times;</button></div>`).join('') : '<p class="text-xs text-stone-500 italic">No questions yet. Note them down for your clinic visit.</p>') + cBack(),
+      good: () => '<p class="text-xs font-bold text-stone-800">Three small good things from today</p>' + [1, 2, 3].map(n => `<input id="g${n}" placeholder="${n}. Something that went okay" class="w-full p-2 rounded-xl bg-white border border-stone-200 text-xs text-stone-900">`).join('') + cBtn('🫙 Save to Memory Jar', 'saveGood()', 'bg-rose-500 text-white text-center') + cBack(),
+      support: () => cCard('If worry or sadness remains heavy, please connect with your clinic counsellor. You do not have to walk this alone.') +
+        cCard('India Mental Health Helpline: <b>Tele-MANAS 14416</b> (Free 24/7).') + cBack()
+    };
+
+    function calmView(n) { stopGuide(); const b = document.getElementById('calm-body'); b.innerHTML = CALM[n](); b.parentElement.scrollTop = 0; }
+    function openCalm() { document.getElementById('calm-modal').classList.remove('hidden'); calmView('home'); }
+    function closeCalm() { stopGuide(); document.getElementById('calm-modal').classList.add('hidden'); }
+    function painLevel(n) {
+      document.getElementById('pain-res').innerHTML = n >= 7 ? `<div class="rounded-2xl bg-rose-50 border border-rose-300 p-3 space-y-1 text-xs text-rose-900"><p class="font-bold">This is strong discomfort. Please reach out to your doctor or nurse directly.</p></div>`
+        : n >= 4 ? cCard('<b>Moderate.</b> Try gentle slow-exhale breathing or rest with a pillow under your knees.') : cCard('<b>Mild.</b> Gentle relaxation and hydration help.');
+    }
+    function mood(m) {
+      const t = { Calm: 'Rest in this gentle feeling.', Okay: 'Okay is completely enough.', Anxious: 'Anxiety is loud, but it passes.', Low: 'Being low is allowed. Rest.', Angry: 'Anger is valid. Cool down softly.', 'In pain': 'Let us check comfort measures.' }[m];
+      document.getElementById('mood-res').innerHTML = cCard(t);
+    }
+    function qAdd() { const i = document.getElementById('q-in'), t = i.value.trim(); if (!t) return; questions.push({ id: Date.now(), text: t, done: false }); saveState(); calmView('questions'); }
+    function qToggle(id) { const q = questions.find(x => x.id === id); if (q) q.done = !q.done; saveState(); calmView('questions'); }
+    function qDel(id) { questions = questions.filter(x => x.id !== id); saveState(); calmView('questions'); }
+    function saveGood() {
+      const v = [1, 2, 3].map(n => document.getElementById('g' + n).value.trim()).filter(Boolean);
+      if (!v.length) { showToast('Write at least one small good thing.'); return; }
+      savedLetters.unshift({ id: Date.now(), author: currentAuthor, tag: '🌙 Good Things', date: `Day ${getTodayDay()} • ${new Date().toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}`, text: v.join(' • '), photo: null });
+      saveState(); renderSavedLetters(); updateWinsDisplay(); showToast('🌙 Saved to Jar.'); calmView('home');
+    }
+
+    function checkPinLock() {
+      if (appPin && appPin.trim().length === 4) {
+        document.getElementById('lock-screen-overlay').classList.remove('hidden');
+      } else {
+        document.getElementById('lock-screen-overlay').classList.add('hidden');
+      }
+    }
+    function attemptUnlock() {
+      const entered = document.getElementById('unlock-pin-field').value.trim();
+      if (entered === appPin) {
+        document.getElementById('lock-screen-overlay').classList.add('hidden');
+        document.getElementById('unlock-pin-field').value = '';
+        showToast("🌸 Welcome back.");
+      } else {
+        showToast("Incorrect PIN. Please try again.");
+      }
+    }
+    function openPinModal() {
+      document.getElementById('pin-input-field').value = appPin || '';
+      document.getElementById('pin-modal').classList.remove('hidden');
+    }
+    function closePinModal() { document.getElementById('pin-modal').classList.add('hidden'); }
+    function savePinCode() {
+      const p = document.getElementById('pin-input-field').value.trim();
+      if (p.length === 4 && /^\d+$/.test(p)) {
+        appPin = p;
+        saveState();
+        closePinModal();
+        showToast("🔒 PIN set. Light privacy active.");
+      } else {
+        showToast("Enter exactly 4 digits.");
+      }
+    }
+    function removePinCode() {
+      appPin = '';
+      saveState();
+      closePinModal();
+      showToast("🔓 PIN turned off.");
+    }
+
+    function applyHardDay() { document.body.classList.toggle('hard-day', hardDay); }
+    function toggleHardDay() {
+      hardDay = !hardDay;
+      if (hardDay) hopeTone = 'Just today';
+      applyHardDay();
+      saveState();
+      renderDailyView();
+      updateHopeCardUI();
+      drawHopeCard();
+      calmView('home');
+      showToast(hardDay ? '🕊️ Hard Day mode active.' : 'Hard Day mode off.');
+    }
+
+    function toggleRestProtocol(toggle) {
+      isRestMonthActive = toggle.checked;
+      updateRoadmapPhase2UI();
+      saveState();
+      showToast(isRestMonthActive ? "🕊️ 1-Month rest noted." : "⚡ Standard cycle active.");
+    }
+    function updateRoadmapPhase2UI() {
+      const title = document.getElementById('phase2-title');
+      const desc = document.getElementById('phase2-desc');
+      const tag = document.getElementById('phase2-tag');
+      const badge = document.getElementById('phase2-badge');
+
+      if (isRestMonthActive) {
+        if (title) title.innerText = '1-Month Ovary Rest & Recovery';
+        if (desc) desc.innerText = 'A 30-day gap before transfer to let ovaries recover and lining reset.';
+        if (tag) {
+          tag.innerText = 'REST & RECOVERY (IF ADVISED)';
+          tag.className = 'text-[11px] font-extrabold uppercase text-amber-800 bg-amber-100 px-2 py-0.5 rounded-full';
+        }
+        if (badge) badge.className = 'w-7 h-7 rounded-full bg-amber-500 text-white font-bold text-xs flex items-center justify-center shrink-0 z-10';
+      } else {
+        if (title) title.innerText = 'Embryo Development & Uterine Prep';
+        if (desc) desc.innerText = 'Embryologists nurture blastocysts while proceeding toward lining prep.';
+        if (tag) {
+          tag.innerText = 'LAB & RECOVERY';
+          tag.className = 'text-[11px] font-extrabold uppercase text-stone-700 bg-stone-100 px-2 py-0.5 rounded-full';
+        }
+        if (badge) badge.className = 'w-7 h-7 rounded-full bg-stone-300 text-stone-700 font-bold text-xs flex items-center justify-center shrink-0 z-10';
+      }
+    }
+
+    function openProtocolModal() {
+      document.getElementById('edit-start-date').value = cycleStartDateStr;
+      const gonal = routineMeds.find(m => m.id === 'med4');
+      if (gonal) {
+        document.getElementById('edit-gonal-dose').value = gonal.dose;
+      }
+      document.getElementById('protocol-modal').classList.remove('hidden');
+    }
+    function closeProtocolModal() { document.getElementById('protocol-modal').classList.add('hidden'); }
+    function saveProtocolUpdates() {
+      const newStart = document.getElementById('edit-start-date').value;
+      if (newStart) {
+        cycleStartDateStr = newStart;
+        const p = newStart.split('-');
+        stimStartDate = new Date(parseInt(p[0], 10), parseInt(p[1], 10) - 1, parseInt(p[2], 10));
+        calDisplayDate = new Date(stimStartDate);
+      }
+      const gonal = routineMeds.find(m => m.id === 'med4');
+      if (gonal) {
+        gonal.dose = document.getElementById('edit-gonal-dose').value;
+        const t = document.getElementById('edit-injection-time').value;
+        if (t) gonal.time = formatTime12(t);
+      }
+      selectedDay = getTodayDay();
+      sortRoutineMeds();
+      saveState();
+      renderDayPills();
+      renderDailyView();
+      renderCalendar();
+      updateDueDateCalculation();
+      closeProtocolModal();
+      showToast("Protocol updated!");
+    }
+
+    function formatTime12(time24) {
+      const [h, m] = time24.split(':');
+      let hour = parseInt(h, 10);
+      const ampm = hour >= 12 ? 'PM' : 'AM';
+      hour = hour % 12 || 12;
+      return `${hour}:${m} ${ampm}`;
+    }
+
+    function openMissedDoseModal() {
+      document.getElementById('missed-dose-modal').classList.remove('hidden');
+    }
+    function closeMissedDoseModal() { document.getElementById('missed-dose-modal').classList.add('hidden'); }
+    function openPlanChangesModal() { document.getElementById('plan-changes-modal').classList.remove('hidden'); }
+    function closePlanChangesModal() { document.getElementById('plan-changes-modal').classList.add('hidden'); }
+
+    function switchTab(tab) {
+      ['home', 'calendar', 'roadmap', 'journal'].forEach(t => {
+        document.getElementById(`screen-${t}`).classList.add('hidden');
+        document.getElementById(`nav-btn-${t}`).className = 'flex flex-col items-center justify-center w-14 h-12 text-stone-500 hover:text-stone-800 transition';
+      });
+      document.getElementById(`screen-${tab}`).classList.remove('hidden');
+      document.getElementById(`nav-btn-${tab}`).className = 'flex flex-col items-center justify-center w-14 h-12 text-rose-600 font-extrabold transition';
+      if (tab === 'calendar') renderCalendar();
+      if (tab === 'roadmap') updateDueDateCalculation();
+      document.getElementById('scroll-container').scrollTop = 0;
+    }
+
+    function esc(t) { return String(t).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c])); }
+    function renderRx() {
+      const ul = document.getElementById('rx-list');
+      if (ul) ul.innerHTML = routineMeds.map(m => `<li><strong>${esc(m.name)}</strong> - ${esc(m.dose)} at ${esc(m.time)}</li>`).join('');
+    }
+    function triggerHeartbeatEffect() {
+      playLoveChime();
+      if (userSettings.haptics && navigator.vibrate) navigator.vibrate([80, 50, 80]);
+      showToast("🤍 Womb whispers: 'You are brave and tender.'");
+    }
+    function sendSilentHug() {
+      playLoveChime();
+      if (userSettings.haptics && navigator.vibrate) navigator.vibrate([100, 60, 100]);
+      const t = "🤍 A silent hug from me to you. We've got this, together.";
+      if (navigator.share) navigator.share({ text: t }).catch(() => {});
+      else showToast('🤍 ' + t);
+    }
+
+    function setupBreathingLoop() {
+      const p = document.getElementById('modal-breathing-prompt');
+      const steps = [
+        ['Inhale Hope (4s)', 4000, 'inhale', 'Inhale calm'],
+        ['Hold Gentle (7s)', 7000, '', 'Hold gently'],
+        ['Exhale Peace (8s)', 8000, 'exhale', 'Exhale tension']
+      ];
+      let i = 0;
+      (function next() {
+        if (p) {
+          p.innerText = steps[i][0];
+          if (document.getElementById('breathing-modal') && !document.getElementById('breathing-modal').classList.contains('hidden')) {
+            if (steps[i][2]) playBreathTone(steps[i][2]);
+            if (steps[i][3]) speakSoftly(steps[i][3]);
+          }
+        }
+        setTimeout(next, steps[i][1]);
+        i = (i + 1) % 3;
+      })();
+    }
+
+    function openBreathingModal() { document.getElementById('breathing-modal').classList.remove('hidden'); }
+    function closeBreathingModal() { document.getElementById('breathing-modal').classList.add('hidden'); }
+
+    function exportBackup() {
+      const payload = {
+        version: 2,
+        exportedAt: new Date().toISOString(),
+        deviceId: ensureDeviceId(),
+        shared: getSharedSnapshot(),
+        local: getLocalSnapshot(),
+        outboxCount: outbox.length
+      };
+      const blob = new Blob([JSON.stringify(payload, null, 2)], { type: 'application/json' });
+      const a = document.createElement('a');
+      a.href = URL.createObjectURL(blob);
+      a.download = 'dsr-hope-backup-' + new Date().toISOString().slice(0, 10) + '.json';
+      document.body.appendChild(a); a.click(); a.remove();
+      URL.revokeObjectURL(a.href);
+      showToast('💾 Backup saved to Downloads');
+    }
+
+    function importBackup(input) {
+      const f = input.files && input.files[0]; if (!f) return;
+      if (!confirm('Replace existing data on this phone with the backup file?')) return;
+      const rd = new FileReader();
+      rd.onload = () => {
+        try {
+          const data = JSON.parse(rd.result);
+          // Support both old flat format and new v2 format
+          let flat;
+          if (data.version === 2 && data.shared) {
+            flat = { ...data.shared, ...(data.local || {}) };
+          } else {
+            flat = data;
+          }
+          localStorage.setItem(STORAGE_KEY, JSON.stringify(flat));
+          location.reload();
+        } catch (e) {
+          showToast('Invalid backup file.');
+        }
+      };
+      rd.readAsText(f);
+    }
+
+    function showToast(message) {
+      const existing = document.getElementById('toast-msg');
+      if (existing) existing.remove();
+
+      const toast = document.createElement('div');
+      toast.id = 'toast-msg';
+      toast.className = 'fixed top-12 left-1/2 -translate-x-1/2 max-w-[90%] bg-stone-900/95 text-white text-xs font-semibold py-2.5 px-4 rounded-2xl shadow-xl backdrop-blur-md z-[150] text-center transition-all duration-300';
+      toast.innerText = message;
+      document.body.appendChild(toast);
+
+      setTimeout(() => {
+        toast.style.opacity = '0';
+        setTimeout(() => toast.remove(), 300);
+      }, 3200);
+    }
+
+    function requestAlertsPermission() {
+      showToast("Reminders active. Set your daily alarms.");
+    }
+
+    function setupAppWakeListeners() {
+      document.addEventListener('visibilitychange', () => {
+        if (document.visibilityState === 'visible') {
+          selectedDay = getTodayDay();
+          renderDailyView();
+          renderCalendar();
+          updateWinsDisplay();
+          scrollToActiveDayPill();
+        }
+      });
+      window.addEventListener('focus', () => {
+        selectedDay = getTodayDay();
+        renderDailyView();
+        renderCalendar();
+        updateWinsDisplay();
+        scrollToActiveDayPill();
+      });
+    }
+
+    /* =========================================================
+       PHASE 3 — SUPABASE AUTH + SYNC + WEB PUSH
+       ========================================================= */
+    let sb = null;
+    let currentUser = null;
+    let currentMember = null; // { user_id, couple_id, role, display_name }
+
+    function initSupabase() {
+      const cfg = window.DSR_CONFIG || {};
+      if (!cfg.supabaseUrl || !cfg.supabaseAnonKey || cfg.supabaseAnonKey.indexOf('PASTE_') === 0) {
+        console.warn('Supabase keys not set yet');
+        return null;
+      }
+      if (typeof supabase === 'undefined' || !supabase.createClient) {
+        console.warn('Supabase SDK not loaded');
+        return null;
+      }
+      sb = supabase.createClient(cfg.supabaseUrl, cfg.supabaseAnonKey);
+      return sb;
+    }
+
+    function openAuthOverlay() {
+      document.getElementById('sync-auth-overlay').classList.remove('hidden');
+      refreshAuthUI();
+    }
+    function closeAuthOverlay() {
+      document.getElementById('sync-auth-overlay').classList.add('hidden');
+    }
+
+    async function refreshAuthUI() {
+      if (!sb) return;
+      const { data: { session } } = await sb.auth.getSession();
+      currentUser = session?.user || null;
+      const loginEl = document.getElementById('auth-step-login');
+      const coupleEl = document.getElementById('auth-step-couple');
+      const readyEl = document.getElementById('auth-step-ready');
+      loginEl.classList.add('hidden');
+      coupleEl.classList.add('hidden');
+      readyEl.classList.add('hidden');
+
+      if (!currentUser) {
+        loginEl.classList.remove('hidden');
+        return;
+      }
+
+      const { data: mem } = await sb.from('members').select('*').eq('user_id', currentUser.id).maybeSingle();
+      currentMember = mem || null;
+
+      if (!currentMember) {
+        coupleEl.classList.remove('hidden');
+        return;
+      }
+
+      readyEl.classList.remove('hidden');
+      document.getElementById('auth-role-label').innerText =
+        `Signed in as ${currentMember.role} • couple linked`;
+      // Show invite code to the creator
+      const { data: couple } = await sb.from('couples').select('invite_code').eq('id', currentMember.couple_id).maybeSingle();
+      if (couple?.invite_code) {
+        const inv = document.getElementById('auth-invite-display');
+        inv.innerText = 'Invite code for partner: ' + couple.invite_code;
+        inv.classList.remove('hidden');
+      }
+    }
+
+    async function authSignUp() {
+      const email = document.getElementById('auth-email').value.trim();
+      const password = document.getElementById('auth-password').value;
+      const msg = document.getElementById('auth-msg');
+      msg.innerText = 'Creating account…';
+      const { error } = await sb.auth.signUp({ email, password });
+      if (error) { msg.innerText = error.message; return; }
+      msg.innerText = 'Account created. Check email if confirmation is required, then sign in.';
+    }
+
+    async function authSignIn() {
+      const email = document.getElementById('auth-email').value.trim();
+      const password = document.getElementById('auth-password').value;
+      const msg = document.getElementById('auth-msg');
+      msg.innerText = 'Signing in…';
+      const { error } = await sb.auth.signInWithPassword({ email, password });
+      if (error) { msg.innerText = error.message; return; }
+      msg.innerText = '';
+      await refreshAuthUI();
+      startSyncLoop();
+    }
+
+    async function authSignOut() {
+      await sb.auth.signOut();
+      currentUser = null;
+      currentMember = null;
+      await refreshAuthUI();
+    }
+
+    function randomInviteCode() {
+      const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
+      let s = '';
+      for (let i = 0; i < 6; i++) s += chars[Math.floor(Math.random() * chars.length)];
+      return s;
+    }
+
+    async function createCouple() {
+      const msg = document.getElementById('auth-couple-msg');
+      msg.innerText = 'Creating couple…';
+      const code = randomInviteCode();
+      const { data: couple, error } = await sb.from('couples').insert({ invite_code: code }).select().single();
+      if (error) { msg.innerText = error.message; return; }
+      const { error: mErr } = await sb.from('members').insert({
+        user_id: currentUser.id,
+        couple_id: couple.id,
+        role: 'wife',
+        display_name: 'Mommy'
+      });
+      if (mErr) { msg.innerText = mErr.message; return; }
+      msg.innerText = '';
+      await refreshAuthUI();
+      startSyncLoop();
+      showToast('Couple created. Share the invite code with your partner.');
+    }
+
+    async function joinCouple() {
+      const msg = document.getElementById('auth-couple-msg');
+      const code = document.getElementById('auth-invite').value.trim().toUpperCase();
+      if (!code) { msg.innerText = 'Enter the invite code'; return; }
+      msg.innerText = 'Joining…';
+      const { data: couple, error } = await sb.from('couples').select('id').eq('invite_code', code).maybeSingle();
+      if (error || !couple) { msg.innerText = 'Invalid invite code'; return; }
+      const { error: mErr } = await sb.from('members').insert({
+        user_id: currentUser.id,
+        couple_id: couple.id,
+        role: 'husband',
+        display_name: 'Daddy'
+      });
+      if (mErr) { msg.innerText = mErr.message; return; }
+      msg.innerText = '';
+      await refreshAuthUI();
+      startSyncLoop();
+      showToast('Joined couple successfully.');
+    }
+
+    // ---- Outbox flush + pull ----
+    async function flushOutbox() {
+      if (!sb || !currentMember || !navigator.onLine) return;
+      if (!outbox.length) return;
+      const remaining = [];
+      for (const entry of outbox) {
+        try {
+          const row = {
+            couple_id: currentMember.couple_id,
+            kind: entry.kind,
+            key: entry.key,
+            value: entry.value === null ? {} : (typeof entry.value === 'object' ? entry.value : { v: entry.value }),
+            updated_at: entry.ts || new Date().toISOString(),
+            updated_by: currentUser.id,
+            deleted: entry.op === 'delete'
+          };
+          const { error } = await sb.from('items').upsert(row, { onConflict: 'couple_id,kind,key' });
+          if (error) remaining.push(entry);
+        } catch (_) {
+          remaining.push(entry);
+        }
+      }
+      outbox = remaining;
+      try { localStorage.setItem(OUTBOX_KEY, JSON.stringify(outbox)); } catch (e) {}
+    }
+
+    async function pullRemoteChanges() {
+      if (!sb || !currentMember) return;
+      const since = lastSyncAt || '1970-01-01T00:00:00Z';
+      const { data, error } = await sb
+        .from('items')
+        .select('*')
+        .eq('couple_id', currentMember.couple_id)
+        .gt('updated_at', since)
+        .order('updated_at', { ascending: true });
+      if (error || !data) return;
+
+      let changed = false;
+      for (const row of data) {
+        applyRemoteItem(row);
+        changed = true;
+        if (!lastSyncAt || row.updated_at > lastSyncAt) lastSyncAt = row.updated_at;
+      }
+      if (changed) {
+        saveState(); // persist merged state locally (no new outbox entry)
+        renderDailyView();
+        renderSavedLetters();
+        updateWinsDisplay();
+        updateMilestonesUI();
+        renderTeamNeedsUI();
+        renderCalendar();
+      }
+    }
+
+    function applyRemoteItem(row) {
+      const { kind, key, value, deleted } = row;
+      if (kind === 'med_done') {
+        if (deleted || value === false || value?.v === false) delete completedMeds[key];
+        else completedMeds[key] = true;
+      } else if (kind === 'letter') {
+        if (deleted) {
+          savedLetters = savedLetters.filter(l => String(l.id) !== String(key));
+        } else {
+          const existing = savedLetters.findIndex(l => String(l.id) === String(key));
+          const letter = value;
+          if (existing >= 0) savedLetters[existing] = { ...savedLetters[existing], ...letter };
+          else savedLetters.unshift(letter);
+        }
+      } else if (kind === 'milestone') {
+        if (value && typeof value === 'object') milestones = { ...milestones, ...value };
+      } else if (kind === 'settings_shared' || kind === 'routine_med') {
+        if (kind === 'routine_med' && Array.isArray(value)) routineMeds = value;
+      } else if (kind === 'need') {
+        if (Array.isArray(value)) selectedNeeds = value;
+        else if (value?.list) selectedNeeds = value.list;
+      } else if (kind === 'mood') {
+        if (key === 'mom' && value?.v) momMood = value.v;
+        if (key === 'partner' && value?.v) partnerMood = value.v;
+      } else if (kind === 'appreciation') {
+        partnerAppreciation = value?.v || value || '';
+      } else if (kind === 'calendar_note') {
+        if (deleted) delete customCalNotes[key];
+        else customCalNotes[key] = value?.notes || value || [];
+      } else if (kind === 'question') {
+        if (Array.isArray(value)) questions = value;
+      }
+      // cycle flags
+      if (kind === 'settings_shared' && value) {
+        if (value.cycleStartDateStr) {
+          cycleStartDateStr = value.cycleStartDateStr;
+          const p = cycleStartDateStr.split('-');
+          stimStartDate = new Date(+p[0], +p[1] - 1, +p[2]);
+        }
+        if (typeof value.isPaused === 'boolean') isPaused = value.isPaused;
+        if (typeof value.isRestMonthActive === 'boolean') isRestMonthActive = value.isRestMonthActive;
+      }
+    }
+
+    let syncTimer = null;
+    function startSyncLoop() {
+      if (syncTimer) return;
+      const tick = async () => {
+        if (!navigator.onLine || !currentMember) return;
+        await flushOutbox();
+        await pullRemoteChanges();
+      };
+      tick();
+      syncTimer = setInterval(tick, 25000);
+      window.addEventListener('online', tick);
+
+      // Realtime
+      if (sb && currentMember) {
+        sb.channel('items-live')
+          .on('postgres_changes', {
+            event: '*',
+            schema: 'public',
+            table: 'items',
+            filter: `couple_id=eq.${currentMember.couple_id}`
+          }, () => { pullRemoteChanges(); })
+          .subscribe();
+      }
+    }
+
+    // ---- Web Push registration ----
+    function urlBase64ToUint8Array(base64String) {
+      const padding = '='.repeat((4 - (base64String.length % 4)) % 4);
+      const base64 = (base64String + padding).replace(/-/g, '+').replace(/_/g, '/');
+      const raw = atob(base64);
+      const arr = new Uint8Array(raw.length);
+      for (let i = 0; i < raw.length; i++) arr[i] = raw.charCodeAt(i);
+      return arr;
+    }
+
+    async function registerPush() {
+      if (!('serviceWorker' in navigator) || !('PushManager' in window)) {
+        showToast('Push not supported on this browser');
+        return;
+      }
+      try {
+        const reg = await navigator.serviceWorker.register('./sw.js');
+        await navigator.serviceWorker.ready;
+        const perm = await Notification.requestPermission();
+        if (perm !== 'granted') {
+          showToast('Notification permission denied');
+          return;
+        }
+        const sub = await reg.pushManager.subscribe({
+          userVisibleOnly: true,
+          applicationServerKey: urlBase64ToUint8Array(window.DSR_CONFIG.vapidPublicKey)
+        });
+        const json = sub.toJSON();
+        if (sb && currentUser) {
+          await sb.from('push_subscriptions').upsert({
+            user_id: currentUser.id,
+            endpoint: json.endpoint,
+            keys: json.keys
+          }, { onConflict: 'user_id,endpoint' });
+        }
+        showToast('Notifications enabled');
+      } catch (e) {
+        console.error(e);
+        showToast('Could not enable notifications');
+      }
+    }
+
+    // Register SW early
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', () => {
+        navigator.serviceWorker.register('./sw.js').catch(() => {});
+      });
+    }
+
+    // Extend original init
+    const _origInitApp = initApp;
+    initApp = async function () {
+      _origInitApp();
+      initSupabase();
+      if (sb) {
+        const { data: { session } } = await sb.auth.getSession();
+        if (session?.user) {
+          currentUser = session.user;
+          const { data: mem } = await sb.from('members').select('*').eq('user_id', currentUser.id).maybeSingle();
+          currentMember = mem || null;
+          if (currentMember) startSyncLoop();
+        }
+      }
+      // Small sync status button in header (optional entry to auth)
+      try {
+        const cluster = document.querySelector('.flex.items-center.gap-2');
+        if (cluster && !document.getElementById('sync-link-btn')) {
+          const btn = document.createElement('button');
+          btn.id = 'sync-link-btn';
+          btn.className = 'h-7 px-2.5 rounded-full text-[11px] font-bold border bg-white/80 text-stone-700 hover:bg-white active:scale-95 transition flex items-center justify-center shadow-2xs';
+          btn.title = 'Link phones / Sync';
+          btn.innerText = '🔗 Sync';
+          btn.onclick = openAuthOverlay;
+          cluster.insertBefore(btn, cluster.firstChild);
+        }
+      } catch (e) {}
+    };
+
+    window.onload = initApp;
+  </script>
+</body>
+</html>
